@@ -57,7 +57,21 @@ test("captures every page and required viewport", async ({ page }) => {
   }
 });
 
-test("captures mobile menu and lightbox states", async ({ page }) => {
+test("captures expanded brand accordions at every required viewport", async ({ page }) => {
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto(sitePath("/gallery/"));
+    await page.locator("#brand-mchose > summary").click();
+    await preloadVisibleInlineImages(page);
+    await page.screenshot({
+      path: `.omo/evidence/keyboard-catalog/gallery-${viewport.width}-accordion-expanded.png`,
+      fullPage: true,
+      animations: "disabled",
+    });
+  }
+});
+
+test("captures mobile menu, model dialog, and model-page lightbox states", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(sitePath("/"));
   await page.getByRole("button", { name: "目录" }).click();
@@ -65,6 +79,17 @@ test("captures mobile menu and lightbox states", async ({ page }) => {
   await page.screenshot({ path: ".omo/evidence/keyboard-catalog/home-375-menu-open.png", fullPage: true });
 
   await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(sitePath("/gallery/"));
+  await page.locator("#brand-mchose > summary").click();
+  await page.getByRole("link", { name: /G98 Pro V2/ }).click();
+  await preloadVisibleInlineImages(page);
+  const modelDialog = page.getByRole("dialog", { name: "型号配色一览" });
+  await modelDialog.evaluate((element) => {
+    if (element instanceof HTMLDialogElement) element.scrollTop = 0;
+  });
+  await expect(modelDialog.getByRole("button", { name: "关闭" })).toBeVisible();
+  await page.screenshot({ path: ".omo/evidence/keyboard-catalog/gallery-1280-model-dialog.png" });
+
   await page.goto(sitePath("/gallery/mchose-g98-pro-v2/#color-chenglan"));
   await page.getByRole("button", { name: /橙蓝 · 雪虎轴 · 放大查看/ }).click();
   await preloadVisibleInlineImages(page);
