@@ -121,9 +121,22 @@ All intent spacing derives from 4px.
 - Accessibility: explicit width/height or aspect ratio reserves layout space; decorative artwork uses empty alt; meaningful imagery uses specific alt.
 - Keyboard treatment: `catalog-4x3` and `detail-landscape` use `object-fit: contain` so the complete front view remains visible.
 
-### Brand and Color Sections
+### Brand Accordion
 
-- Catalog index: one semantic `<section>` per brand, each with a labelled heading and model-link grid.
+- Structure: four vertically stacked native `<details data-brand-section>` elements; each `<summary>` contains the brand index, heading, model count, and disclosure mark, followed by that brand's model-link grid.
+- States: collapsed on initial catalog entry, expanded, and summary focus-visible. A matching `#brand-<slug>` hash opens only its target accordion as progressive enhancement.
+- Accessibility: native summary keyboard behavior is preserved, the complete summary is a 44px minimum target, and every model remains a real link to its canonical model page when JavaScript is unavailable.
+- Motion: disclosure state changes are instant. The model grid never animates height, position, or layout.
+
+### ModelDialog
+
+- Structure: one native `<dialog>` for the catalog, with one hidden panel per model. The active panel contains a model heading, every color, every switch or official-image variant as a `Figure` with caption, a close control, and a full-page fallback link.
+- States: closed or open with exactly one model panel visible.
+- Accessibility: model links are progressively enhanced as openers; the dialog receives the matching model panel, Escape and backdrop close it, focus moves to the close control on open, and focus returns to the invoking model link on close. Dialogs are never nested.
+- Motion: opening, closing, and model-panel changes are instant with no transient animation.
+
+### Color Sections
+
 - Model page: one anchored `<section id="color-<slug>">` per color; every local image variant is visible inside its color section without client-side filtering.
 - Multi-image colors: each switch or official-image variant is named in selectable text and its figure caption.
 
@@ -165,10 +178,10 @@ All intent spacing derives from 4px.
 | Standard | `--motion-standard` | 240ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Menu |
 | Entry | `--motion-entry` | 400ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Story reveal |
 
-- Motion communicates navigation and state; Lightbox changes are intentionally instant, and motion is never ornamental.
+- Motion communicates navigation and state; Brand Accordion, ModelDialog, and Lightbox state changes are intentionally instant, and motion is never ornamental.
 - Only `opacity`, `transform`, and carefully bounded `filter` animate. Width, height, margin, position, and layout grids never animate.
 - IntersectionObserver may reveal non-critical story modules; all content remains visible if JavaScript is unavailable.
-- Under `prefers-reduced-motion: reduce`, non-essential transitions stop and menu states render immediately; Lightbox states are already instant.
+- Under `prefers-reduced-motion: reduce`, non-essential transitions stop and menu states render immediately; Brand Accordion, ModelDialog, and Lightbox states are already instant.
 
 ## 7. Depth & Surface
 
