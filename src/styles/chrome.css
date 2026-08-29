@@ -22,6 +22,7 @@
 
 .menu-button,
 .outline-button,
+.model-dialog-control,
 .lightbox-control,
 .lightbox-trigger {
   min-block-size: 44px;
@@ -41,6 +42,7 @@
 
 .menu-button:hover,
 .outline-button:hover,
+.model-dialog-control:hover,
 .lightbox-control:hover,
 .lightbox-trigger:hover {
   background: var(--color-ink);
@@ -49,6 +51,7 @@
 
 .menu-button:active,
 .outline-button:active,
+.model-dialog-control:active,
 .lightbox-control:active,
 .lightbox-trigger:active {
   transform: scale(0.98);

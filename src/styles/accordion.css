@@ -1,0 +1,298 @@
+.brand-catalog {
+  padding-block-start: var(--space-8);
+}
+
+.brand-accordion {
+  border-block-start: 1px solid var(--color-rule-strong);
+}
+
+.brand-accordion:last-child {
+  border-block-end: 1px solid var(--color-rule-strong);
+}
+
+.brand-summary-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-block-size: 44px;
+  padding-block: var(--space-4);
+  cursor: pointer;
+  list-style: none;
+}
+
+.brand-summary-row::-webkit-details-marker {
+  display: none;
+}
+
+.brand-summary-row::after {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  align-self: center;
+  content: "+";
+  font-family: var(--font-ui);
+  font-size: var(--type-story-title);
+  line-height: 1;
+}
+
+.brand-accordion[open] > .brand-summary-row::after {
+  content: "−";
+}
+
+.brand-summary-ribbon {
+  grid-column: 1;
+  inline-size: fit-content;
+  margin-block-end: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-ink);
+  color: var(--color-inverse);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: 0.1em;
+}
+
+.brand-summary-title {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: var(--type-feature-title);
+  letter-spacing: -0.02em;
+  line-break: strict;
+  line-height: 1.05;
+  text-wrap: pretty;
+}
+
+.brand-summary-count {
+  grid-column: 1;
+  color: var(--color-caption);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+}
+
+.brand-accordion[open] > .brand-summary-row {
+  border-block-end: 1px solid var(--color-rule);
+}
+
+.model-list {
+  display: grid;
+  gap: var(--space-6);
+  margin: 0;
+  padding: var(--space-8) 0 var(--space-12);
+  list-style: none;
+}
+
+.model-entry {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  border-block-start: 1px solid var(--color-rule-strong);
+  padding-block-start: var(--space-4);
+  text-decoration: none;
+}
+
+.model-entry-copy {
+  display: grid;
+  align-content: start;
+}
+
+.model-entry-number {
+  margin-block-end: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--type-feature-title);
+  line-height: 1;
+}
+
+.model-entry-title {
+  margin-block-end: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--type-story-title);
+  letter-spacing: -0.02em;
+  line-break: strict;
+  line-height: 1.12;
+  text-wrap: pretty;
+}
+
+.model-entry-summary {
+  color: var(--color-ink-soft);
+  line-break: strict;
+  text-wrap: pretty;
+  word-break: auto-phrase;
+}
+
+.gallery-semantic-phrase {
+  white-space: nowrap;
+}
+
+.model-entry:hover .model-entry-title,
+.model-entry:focus-visible .model-entry-title {
+  color: var(--color-link);
+  text-decoration: underline;
+}
+
+.model-dialog {
+  inline-size: min(calc(100% - (2 * var(--space-4))), 1440px);
+  max-block-size: calc(100dvh - (2 * var(--space-4)));
+  padding: var(--space-4);
+  overflow: auto;
+  border: 2px solid var(--color-rule-strong);
+  border-radius: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.model-dialog::backdrop {
+  background: color-mix(in srgb, var(--color-ink) 78%, transparent);
+}
+
+.model-dialog-panel[hidden] {
+  display: none;
+}
+
+.model-dialog-header {
+  padding-block-end: var(--space-6);
+  border-block-end: 1px solid var(--color-rule-strong);
+}
+
+.model-dialog-header .editorial-ribbon {
+  margin-block-end: var(--space-4);
+}
+
+.model-dialog-header h2 {
+  margin-block-end: var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--type-page-title);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-break: strict;
+  line-height: 1.02;
+  text-wrap: pretty;
+}
+
+.model-dialog-header > p:last-child {
+  max-inline-size: 58ch;
+  margin-block-end: 0;
+  color: var(--color-ink-soft);
+  font-size: var(--type-lead);
+  line-break: strict;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.model-dialog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-block-end: 1px solid var(--color-rule);
+}
+
+.model-dialog-control {
+  padding-inline: var(--space-4);
+}
+
+.model-dialog-fullpage-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  font-family: var(--font-ui);
+  font-size: var(--type-ui);
+}
+
+.model-dialog-fullpage-link:hover,
+.model-dialog-fullpage-link:focus-visible {
+  color: var(--color-link);
+}
+
+.model-dialog-color {
+  padding-block: var(--space-8) var(--space-12);
+  border-block-start: 1px solid var(--color-rule-strong);
+}
+
+.model-dialog-color:first-child {
+  border-block-start: 0;
+}
+
+.model-dialog-color-heading {
+  margin-block-end: var(--space-6);
+}
+
+.model-dialog-color-heading h3 {
+  margin-block-end: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--type-feature-title);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.model-dialog-color-heading > p:last-child {
+  margin-block-end: 0;
+  color: var(--color-caption);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+}
+
+.model-dialog-figures {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.model-dialog-variant {
+  margin-block-end: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .brand-summary-row {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr) auto;
+    column-gap: var(--space-6);
+    padding-block: var(--space-6);
+  }
+
+  .brand-summary-row::after {
+    grid-column: 3;
+    grid-row: 1 / 3;
+  }
+
+  .brand-summary-ribbon,
+  .brand-summary-title {
+    grid-column: 1;
+  }
+
+  .brand-summary-count {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+  }
+
+  .model-list,
+  .model-dialog-figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .model-dialog {
+    padding: var(--space-6);
+  }
+
+  .model-dialog-color-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    align-items: end;
+    gap: var(--space-6);
+  }
+
+  .model-dialog-color-heading .kicker,
+  .model-dialog-color-heading h3 {
+    grid-column: 1;
+  }
+
+  .model-dialog-color-heading > p:last-child {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .model-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
