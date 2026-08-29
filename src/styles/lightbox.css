@@ -1,6 +1,6 @@
 .lightbox-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
 }
 
@@ -15,16 +15,25 @@
 .lightbox-trigger img {
   inline-size: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: contain;
 }
 
-.lightbox-trigger span {
+.lightbox-trigger .lightbox-label,
+.lightbox-trigger .lightbox-action {
   display: block;
-  padding: var(--space-2);
+  padding-inline: var(--space-2);
   font-family: var(--font-meta);
   font-size: var(--type-meta);
+}
+
+.lightbox-trigger .lightbox-label {
+  padding-block-start: var(--space-2);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.lightbox-trigger .lightbox-action {
+  padding-block: var(--space-1) var(--space-2);
 }
 
 .lightbox-dialog {
@@ -76,7 +85,7 @@
 
 @media (min-width: 768px) {
   .lightbox-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-6);
   }
 

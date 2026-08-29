@@ -1,0 +1,80 @@
+---
+import EditorialRibbon from "../../components/EditorialRibbon.astro";
+import Lightbox from "../../components/Lightbox.astro";
+import OutlineButton from "../../components/OutlineButton.astro";
+import { brands, type KeyboardModel } from "../../data/keyboards";
+import { resolveImage } from "../../lib/images";
+import { sitePath } from "../../lib/urls";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export function getStaticPaths() {
+  return brands.flatMap((brand) =>
+    brand.models.map((model) => ({
+      params: { model: model.slug },
+      props: { model, brandName: brand.name },
+    })),
+  );
+}
+
+type Props = {
+  readonly model: KeyboardModel;
+  readonly brandName: string;
+};
+
+const { model, brandName }: Props = Astro.props;
+const colorSections = model.colors.map((color) => ({
+  ...color,
+  items: color.images.map((image) => ({
+    src: resolveImage(image.asset),
+    alt: image.alt,
+    caption: image.caption,
+    label: image.variant ?? color.name,
+    buttonLabel: `${color.name} · ${image.variant ?? "正面图"} · 放大查看`,
+  })),
+}));
+---
+
+<BaseLayout
+  title={`${brandName} ${model.name}｜键盘目录`}
+  description={`${brandName} ${model.name} 的 ${model.colors.length} 组配色与全部本地正面图。`}
+>
+  <article>
+    <header class="frame model-header">
+      <div>
+        <EditorialRibbon label={`${brandName} / MODEL`} />
+        <h1 class="model-title">{brandName} {model.name}</h1>
+        <p class="detail-subtitle">{model.summary}</p>
+      </div>
+      <nav class="color-nav" aria-label={`${model.name} 配色目录`}>
+        <p class="kicker">COLOR INDEX / 配色目录</p>
+        <ul>
+          {model.colors.map((color) => <li><a href={`#color-${color.slug}`}>{color.name}</a></li>)}
+        </ul>
+      </nav>
+    </header>
+
+    <div class="frame color-catalog">
+      {
+        colorSections.map((color, index) => (
+          <section
+            id={`color-${color.slug}`}
+            class="color-section"
+            aria-labelledby={`color-${color.slug}-title`}
+            data-color-section
+          >
+            <div class="color-heading">
+              <p class="kicker">COLOR {String(index + 1).padStart(2, "0")}</p>
+              <h2 id={`color-${color.slug}-title`}>{color.name}</h2>
+              <p>{color.images.length} 张正面图</p>
+            </div>
+            <Lightbox items={color.items} label={`${model.name} 图像浏览器`} />
+          </section>
+        ))
+      }
+    </div>
+
+    <div class="frame catalog-return">
+      <OutlineButton href={sitePath("/gallery/")}>返回键盘目录</OutlineButton>
+    </div>
+  </article>
+</BaseLayout>

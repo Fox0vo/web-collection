@@ -5,13 +5,21 @@ import Lightbox from "../components/Lightbox.astro";
 import OutlineButton from "../components/OutlineButton.astro";
 import StoryTile from "../components/StoryTile.astro";
 import TagList from "../components/TagList.astro";
-import { products } from "../data/products";
+import { brands } from "../data/keyboards";
+import { resolveImage } from "../lib/images";
+import { sitePath } from "../lib/urls";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const sample = products[1];
-const lightboxItems = products.slice(0, 2).map((product) => ({
-  ...product.image,
-  label: product.title,
+const sampleBrand = brands[1];
+const sample = sampleBrand.models[1];
+const sampleColor = sample.colors[0];
+const sampleImage = sampleColor.images[0];
+const lightboxItems = sampleColor.images.map((image) => ({
+  src: resolveImage(image.asset),
+  alt: image.alt,
+  caption: image.caption,
+  label: image.variant ?? sampleColor.name,
+  buttonLabel: `${sampleColor.name} · ${image.variant ?? "正面图"} · 放大查看`,
 }));
 ---
 
@@ -43,24 +51,37 @@ const lightboxItems = products.slice(0, 2).map((product) => ({
 
     <section class="showcase-module" aria-labelledby="tags-title">
       <h2 id="tags-title">TagList：常规与空状态</h2>
-      <TagList tags={sample.tags} />
+      <TagList tags={[sampleBrand.name, sample.name]} />
       <TagList tags={[]} label="空标签列表" />
     </section>
 
     <section class="showcase-module" aria-labelledby="figure-title">
       <h2 id="figure-title">Figure：固定比例与说明</h2>
-      <Figure {...sample.image} variant="story-4x3" />
+      <Figure
+        src={resolveImage(sampleImage.asset)}
+        alt={sampleImage.alt}
+        caption={sampleImage.caption}
+        variant="catalog-4x3"
+      />
     </section>
 
     <section class="showcase-module" aria-labelledby="story-title">
       <h2 id="story-title">StoryTile：紧凑样式</h2>
-      <StoryTile product={sample} variant="compact" headingLevel="h3" />
+      <StoryTile
+        href={sitePath(`/gallery/${sample.slug}/`)}
+        kicker={sampleBrand.name}
+        title={sample.name}
+        deck={sample.summary}
+        image={{ src: resolveImage(sampleImage.asset), alt: sampleImage.alt, caption: sampleImage.caption }}
+        variant="compact"
+        headingLevel="h3"
+      />
     </section>
 
     <section class="showcase-module" aria-labelledby="long-title">
       <h2 id="long-title">长文本与 CJK 换行</h2>
       <p class="long-copy">
-        一段很长的中文标题或材料说明需要自然换行，而不是挤压相邻栏目；同时也要允许像 WEB-COLLECTION-OBJECT-REFERENCE-2026-ULTRA-LONG-IDENTIFIER 这样的连续标识在窄屏内安全折行。
+        一段很长的中文标题或材料说明需要自然换行，而不是挤压相邻栏目；同时也要允许像 WEB-COLLECTION-KEYBOARD-REFERENCE-2026-ULTRA-LONG-IDENTIFIER 这样的连续标识在窄屏内安全折行。
       </p>
     </section>
   </div>

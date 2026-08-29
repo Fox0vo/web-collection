@@ -1,13 +1,13 @@
 ---
-import { sitePath } from "../lib/urls";
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
 
 export type LightboxItem = {
-  readonly src: string;
+  readonly src: ImageMetadata;
   readonly alt: string;
   readonly caption: string;
-  readonly width: number;
-  readonly height: number;
   readonly label: string;
+  readonly buttonLabel?: string;
 };
 
 type Props = {
@@ -22,16 +22,21 @@ const { items, label = "产品图像浏览器" } = Astro.props;
   <div class="lightbox-grid">
     {
       items.map((item, index) => (
-        <button class="lightbox-trigger" type="button" data-lightbox-trigger data-index={index}>
-          <img
-            src={sitePath(item.src)}
+        <button
+          class="lightbox-trigger"
+          type="button"
+          aria-label={item.buttonLabel ?? `${item.label} · 放大查看`}
+          data-lightbox-trigger
+          data-index={index}
+        >
+          <Image
+            src={item.src}
             alt={item.alt}
-            width={item.width}
-            height={item.height}
             loading="lazy"
             decoding="async"
           />
-          <span>{item.label} · 放大查看</span>
+          <span class="lightbox-label">{item.label}</span>
+          <span class="lightbox-action" aria-hidden="true">放大查看</span>
         </button>
       ))
     }
@@ -43,7 +48,7 @@ const { items, label = "产品图像浏览器" } = Astro.props;
         items.map((item, index) => (
           <section class="lightbox-panel" data-lightbox-panel hidden={index !== 0}>
             <figure>
-              <img src={sitePath(item.src)} alt={item.alt} width={item.width} height={item.height} />
+              <Image src={item.src} alt={item.alt} loading="lazy" decoding="async" />
               <figcaption>{item.caption}</figcaption>
             </figure>
           </section>

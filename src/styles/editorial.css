@@ -25,6 +25,7 @@
 }
 
 .figure-media--story-4x3,
+.figure-media--catalog-4x3,
 .figure-media--detail-landscape {
   aspect-ratio: 4 / 3;
 }
@@ -37,6 +38,11 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+}
+
+.figure-media--catalog-4x3 img,
+.figure-media--detail-landscape img {
+  object-fit: contain;
 }
 
 .figure figcaption {

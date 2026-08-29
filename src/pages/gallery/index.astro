@@ -1,40 +1,59 @@
 ---
 import EditorialRibbon from "../../components/EditorialRibbon.astro";
-import Lightbox from "../../components/Lightbox.astro";
 import StoryTile from "../../components/StoryTile.astro";
-import { products } from "../../data/products";
+import { brands } from "../../data/keyboards";
+import { resolveImage } from "../../lib/images";
+import { sitePath } from "../../lib/urls";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-
-const leadProduct = products[0];
-const secondaryProducts = products.slice(1);
-const lightboxItems = products.map((product) => ({
-  ...product.image,
-  label: product.title,
-}));
 ---
 
 <BaseLayout
-  title="产品志｜Web Collection"
-  description="浏览 Web Collection 第一期的四件原创产品：叠光灯、粒波收音机、回线椅与墨刻钟。"
+  title="键盘目录｜Web Collection"
+  description="按 SKN、迈从 MCHOSE、EPOMAKER 与 VGN 浏览 7 组键盘型号和 27 组真实配色。"
 >
   <header class="frame page-intro">
-    <EditorialRibbon label="GALLERY / ISSUE 001" />
-    <h1 class="page-title"><span>四件物品，</span><br /><span>四段安静的用途。</span></h1>
-    <p class="lead">这不是购买清单。每一件物品都从一个具体动作出发：读一页书、寻找一个电⁠台、坐下来，或抬头看时间。</p>
+    <EditorialRibbon label="KEYBOARD CATALOG / LOCAL ARCHIVE" />
+    <h1 class="page-title"><span>四个品牌，</span><br /><span>七组型号。</span></h1>
+    <p class="lead">从品牌进入型号，再沿页面查看全部配色与轴体版本。目录使用 41 张本地正面图，不依赖远程图床。</p>
   </header>
 
-  <div class="frame gallery-layout">
-    <div>
-      <StoryTile product={leadProduct} variant="lead" eager />
-    </div>
-    <div class="gallery-secondary">
-      {secondaryProducts.map((product) => <StoryTile product={product} variant="numbered" />)}
-    </div>
+  <div class="frame brand-catalog">
+    {
+      brands.map((brand, brandIndex) => (
+        <section
+          id={`brand-${brand.slug}`}
+          class="brand-section"
+          aria-labelledby={`brand-${brand.slug}-title`}
+          data-brand-section
+        >
+          <div class="brand-heading">
+            <EditorialRibbon label={`BRAND ${String(brandIndex + 1).padStart(2, "0")}`} />
+            <h2 id={`brand-${brand.slug}-title`}>{brand.name}</h2>
+            <p>{brand.models.length} 组型号</p>
+          </div>
+          <div class="model-grid">
+            {brand.models.map((model, modelIndex) => {
+              const representative = model.colors[0].images[0];
+              return (
+                <StoryTile
+                  href={sitePath(`/gallery/${model.slug}/`)}
+                  kicker={`${brand.name} / ${model.colors.length} 组配色`}
+                  title={model.name}
+                  deck={model.summary}
+                  image={{
+                    src: resolveImage(representative.asset),
+                    alt: representative.alt,
+                    caption: representative.caption,
+                  }}
+                  number={String(modelIndex + 1).padStart(2, "0")}
+                  variant="numbered"
+                  eager={brandIndex === 0 && modelIndex === 0}
+                />
+              );
+            })}
+          </div>
+        </section>
+      ))
+    }
   </div>
-
-  <section class="frame image-index" aria-labelledby="image-index-title">
-    <EditorialRibbon label="LIGHTBOX / 图像索引" />
-    <h2 id="image-index-title" class="section-heading">放大看见材料与结构。</h2>
-    <Lightbox items={lightboxItems} />
-  </section>
 </BaseLayout>

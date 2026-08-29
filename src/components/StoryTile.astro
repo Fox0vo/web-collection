@@ -1,29 +1,37 @@
 ---
-import type { Product } from "../data/products";
-import { sitePath } from "../lib/urls";
+import type { ImageMetadata } from "astro";
 import Figure from "./Figure.astro";
 
 type StoryVariant = "lead" | "standard" | "compact" | "numbered";
 
 type Props = {
-  readonly product: Product;
+  readonly href: string;
+  readonly kicker: string;
+  readonly title: string;
+  readonly deck: string;
+  readonly image: {
+    readonly src: ImageMetadata;
+    readonly alt: string;
+    readonly caption: string;
+  };
+  readonly number?: string;
   readonly variant?: StoryVariant;
   readonly headingLevel?: "h2" | "h3";
   readonly eager?: boolean;
 };
 
-const { product, variant = "standard", headingLevel = "h2", eager = false } = Astro.props;
+const { href, kicker, title, deck, image, number, variant = "standard", headingLevel = "h2", eager = false } = Astro.props;
 const Heading = headingLevel;
 ---
 
 <article class:list={["story-tile", `story-tile--${variant}`]}>
-  <a class:list={["story-link", `story-link--${variant}`]} href={sitePath(`/gallery/${product.slug}/`)}>
-    <Figure {...product.image} variant={variant === "lead" ? "hero-16x9" : "story-4x3"} eager={eager} />
+  <a class:list={["story-link", `story-link--${variant}`]} href={href} data-model-link>
+    <Figure {...image} variant={variant === "lead" ? "hero-16x9" : "catalog-4x3"} eager={eager} />
     <div class="story-copy">
-      {variant === "numbered" && <span class="story-number" aria-hidden="true">{product.number}</span>}
-      <p class="kicker">{product.category}</p>
-      <Heading>{product.title}</Heading>
-      <p>{product.deck}</p>
+      {variant === "numbered" && number && <span class="story-number" aria-hidden="true">{number}</span>}
+      <p class="kicker">{kicker}</p>
+      <Heading>{title}</Heading>
+      <p>{deck}</p>
     </div>
   </a>
 </article>

@@ -2,42 +2,58 @@
 import EditorialRibbon from "../components/EditorialRibbon.astro";
 import OutlineButton from "../components/OutlineButton.astro";
 import StoryTile from "../components/StoryTile.astro";
-import { products } from "../data/products";
+import { brands } from "../data/keyboards";
+import { resolveImage } from "../lib/images";
 import { sitePath } from "../lib/urls";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const leadProduct = products[0];
+const leadModel = brands[1].models[0];
+const leadImage = leadModel.colors[0].images[0];
 ---
 
 <BaseLayout
-  title="Web Collection｜安静的产品视觉志"
-  description="以原创图像和中文编辑故事，记录值得被认真观看的日常物件。"
+  title="Web Collection｜本地键盘目录"
+  description="按 4 个品牌、7 组型号与 27 组配色浏览 41 张本地键盘正面图。"
 >
   <section class="frame home-hero" aria-labelledby="home-title">
     <div>
-      <EditorialRibbon label="ISSUE 001 / OBJECTS IN QUIET" />
-      <h1 id="home-title" class="display-title"><span>物件，</span><br /><span>被认真观看。</span></h1>
-      <p class="lead">
-        Web Collection 是一册缓慢更新的产品视觉志。这里不排列价格与参数，而是记⁠录材料如何连接、光如何落下，以及一个物件为何值得留在身边。
-      </p>
+      <EditorialRibbon label="LOCAL KEYBOARD ARCHIVE / 2026" />
+      <h1 id="home-title" class="display-title"><span>键盘，</span><br /><span>按品牌归档。</span></h1>
+      <p class="lead">从品牌选择型号，再查看该型号的全部配色、轴体或官方图片版本。所有条目均来自本站随附的本地正面图清单。</p>
     </div>
     <div>
-      <p class="hero-note">本期收录四件虚构但可被制造的日常物件。所有图像均为本站原创 SVG，不依赖外部图床。</p>
-      <OutlineButton href={sitePath("/gallery/")}>阅读本期产品志</OutlineButton>
+      <p class="hero-note">4 个品牌 · 7 组型号 · 27 组配色 · 41 张正面图。没有远程图片，也不补写清单之外的规格。</p>
+      <OutlineButton href={sitePath("/gallery/")}>浏览键盘目录</OutlineButton>
     </div>
   </section>
 
   <section class="frame page-section" aria-labelledby="feature-title">
-    <EditorialRibbon label="FEATURE / 本期封面" />
-    <h2 id="feature-title" class="section-heading">光不必填满房间。</h2>
-    <StoryTile product={leadProduct} variant="lead" eager />
+    <EditorialRibbon label="FEATURE / 多版本型号" />
+    <h2 id="feature-title" class="section-heading">同一配色，也可能拥有不同轴体版本。</h2>
+    <StoryTile
+      href={sitePath(`/gallery/${leadModel.slug}/`)}
+      kicker={`${brands[1].name} / ${leadModel.colors.length} 组配色`}
+      title={leadModel.name}
+      deck={leadModel.summary}
+      image={{ src: resolveImage(leadImage.asset), alt: leadImage.alt, caption: leadImage.caption }}
+      variant="lead"
+      eager
+    />
   </section>
 
   <section class="frame page-section" aria-labelledby="index-title">
-    <EditorialRibbon label="INDEX / 四件物品" />
-    <h2 id="index-title" class="section-heading">从光线，到时间。</h2>
+    <EditorialRibbon label="INDEX / 四个品牌" />
+    <h2 id="index-title" class="section-heading">先按品牌，再进入型号。</h2>
     <div class="home-index">
-      {products.map((product) => <StoryTile product={product} variant="compact" />)}
+      {
+        brands.map((brand) => (
+          <article class="brand-summary">
+            <p class="kicker">{brand.models.length} 组型号</p>
+            <h3>{brand.name}</h3>
+            <a class="text-link" href={sitePath(`/gallery/#brand-${brand.slug}`)}>查看品牌型号</a>
+          </article>
+        ))
+      }
     </div>
   </section>
 </BaseLayout>
