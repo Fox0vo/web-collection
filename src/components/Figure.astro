@@ -1,0 +1,32 @@
+---
+import { sitePath } from "../lib/urls";
+
+type FigureVariant = "hero-16x9" | "story-4x3" | "detail-portrait" | "detail-landscape";
+
+type Props = {
+  readonly src: string;
+  readonly alt: string;
+  readonly caption: string;
+  readonly width: number;
+  readonly height: number;
+  readonly variant: FigureVariant;
+  readonly eager?: boolean;
+};
+
+const { src, alt, caption, width, height, variant, eager = false } = Astro.props;
+---
+
+<figure class="figure">
+  <div class:list={["figure-media", `figure-media--${variant}`]}>
+    <img
+      src={sitePath(src)}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={eager ? "eager" : "lazy"}
+      fetchpriority={eager ? "high" : "auto"}
+      decoding="async"
+    />
+  </div>
+  <figcaption>{caption}</figcaption>
+</figure>

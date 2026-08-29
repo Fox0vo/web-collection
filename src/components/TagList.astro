@@ -1,0 +1,18 @@
+---
+type Props = {
+  readonly tags: readonly string[];
+  readonly label?: string;
+};
+
+const { tags, label = "条目标签" } = Astro.props;
+---
+
+{
+  tags.length > 0 ? (
+    <ul class="tag-list" aria-label={label}>
+      {tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+  ) : (
+    <p class="tag-list-empty" aria-label={label}>暂无标签</p>
+  )
+}

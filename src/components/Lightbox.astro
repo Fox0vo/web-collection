@@ -1,0 +1,117 @@
+---
+import { sitePath } from "../lib/urls";
+
+export type LightboxItem = {
+  readonly src: string;
+  readonly alt: string;
+  readonly caption: string;
+  readonly width: number;
+  readonly height: number;
+  readonly label: string;
+};
+
+type Props = {
+  readonly items: readonly LightboxItem[];
+  readonly label?: string;
+};
+
+const { items, label = "产品图像浏览器" } = Astro.props;
+---
+
+<light-box>
+  <div class="lightbox-grid">
+    {
+      items.map((item, index) => (
+        <button class="lightbox-trigger" type="button" data-lightbox-trigger data-index={index}>
+          <img
+            src={sitePath(item.src)}
+            alt={item.alt}
+            width={item.width}
+            height={item.height}
+            loading="lazy"
+            decoding="async"
+          />
+          <span>{item.label} · 放大查看</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <dialog class="lightbox-dialog" aria-label={label}>
+    <div aria-live="polite">
+      {
+        items.map((item, index) => (
+          <section class="lightbox-panel" data-lightbox-panel hidden={index !== 0}>
+            <figure>
+              <img src={sitePath(item.src)} alt={item.alt} width={item.width} height={item.height} />
+              <figcaption>{item.caption}</figcaption>
+            </figure>
+          </section>
+        ))
+      }
+    </div>
+    <div class="lightbox-toolbar">
+      <button class="lightbox-control" type="button" data-lightbox-previous>上一张</button>
+      <button class="lightbox-control" type="button" data-lightbox-close>关闭</button>
+      <button class="lightbox-control" type="button" data-lightbox-next>下一张</button>
+    </div>
+  </dialog>
+</light-box>
+
+<script>
+  class LightBox extends HTMLElement {
+    connectedCallback(): void {
+      const dialog = this.querySelector("dialog");
+      const closeButton = this.querySelector("[data-lightbox-close]");
+      const previousButton = this.querySelector("[data-lightbox-previous]");
+      const nextButton = this.querySelector("[data-lightbox-next]");
+      const triggers = Array.from(this.querySelectorAll<HTMLButtonElement>("[data-lightbox-trigger]"));
+      const panels = Array.from(this.querySelectorAll<HTMLElement>("[data-lightbox-panel]"));
+
+      if (
+        !(dialog instanceof HTMLDialogElement) ||
+        !(closeButton instanceof HTMLButtonElement) ||
+        !(previousButton instanceof HTMLButtonElement) ||
+        !(nextButton instanceof HTMLButtonElement) ||
+        panels.length === 0
+      ) return;
+
+      let currentIndex = 0;
+      let opener: HTMLButtonElement | null = null;
+
+      const show = (index: number): void => {
+        currentIndex = (index + panels.length) % panels.length;
+        panels.forEach((panel, panelIndex) => {
+          panel.hidden = panelIndex !== currentIndex;
+        });
+      };
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          const index = Number.parseInt(trigger.dataset["index"] ?? "0", 10);
+          opener = trigger;
+          show(index);
+          dialog.showModal();
+          closeButton.focus();
+        });
+      });
+
+      previousButton.addEventListener("click", () => show(currentIndex - 1));
+      nextButton.addEventListener("click", () => show(currentIndex + 1));
+      closeButton.addEventListener("click", () => dialog.close());
+
+      dialog.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") show(currentIndex - 1);
+        if (event.key === "ArrowRight") show(currentIndex + 1);
+      });
+
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+
+      dialog.addEventListener("close", () => opener?.focus());
+    }
+  }
+
+  if (!customElements.get("light-box")) customElements.define("light-box", LightBox);
+</script>

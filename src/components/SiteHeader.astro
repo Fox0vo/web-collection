@@ -1,0 +1,73 @@
+---
+import { sitePath } from "../lib/urls";
+
+const currentPath = Astro.url.pathname;
+const routes = [
+  { href: "/", label: "首页", active: currentPath === sitePath("/") },
+  { href: "/gallery/", label: "产品志", active: currentPath.includes("/gallery") },
+] as const;
+---
+
+<header class="site-header">
+  <site-nav>
+    <div class="frame header-row">
+      <a class="brand" href={sitePath("/")} aria-label="Web Collection 首页">WEB / COLLECTION</a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-nav">
+        目录
+      </button>
+      <nav id="primary-nav" class="primary-nav" aria-label="主导航" hidden>
+        <ul>
+          {
+            routes.map((route) => (
+              <li>
+                <a href={sitePath(route.href)} aria-current={route.active ? "page" : undefined}>
+                  {route.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  </site-nav>
+</header>
+
+<script>
+  class SiteNav extends HTMLElement {
+    connectedCallback(): void {
+      const button = this.querySelector("button");
+      const navigation = this.querySelector("nav");
+      if (!(button instanceof HTMLButtonElement) || !(navigation instanceof HTMLElement)) return;
+
+      const setOpen = (open: boolean): void => {
+        button.setAttribute("aria-expanded", String(open));
+        navigation.hidden = !open;
+      };
+
+      const desktopMedia = window.matchMedia("(min-width: 768px)");
+      const syncNavigationForViewport = (): void => {
+        if (desktopMedia.matches) {
+          navigation.hidden = false;
+          return;
+        }
+
+        setOpen(false);
+      };
+
+      syncNavigationForViewport();
+      desktopMedia.addEventListener("change", syncNavigationForViewport);
+
+      button.addEventListener("click", () => {
+        setOpen(button.getAttribute("aria-expanded") !== "true");
+      });
+
+      this.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || button.getAttribute("aria-expanded") !== "true") return;
+        setOpen(false);
+        button.focus();
+      });
+    }
+  }
+
+  if (!customElements.get("site-nav")) customElements.define("site-nav", SiteNav);
+</script>

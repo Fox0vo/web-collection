@@ -1,0 +1,17 @@
+---
+type Props = {
+  readonly href?: string;
+  readonly buttonType?: "button" | "submit";
+  readonly disabled?: boolean;
+};
+
+const { href, buttonType = "button", disabled = false } = Astro.props;
+---
+
+{
+  href ? (
+    <a class="outline-button" href={href}><slot /></a>
+  ) : (
+    <button class="outline-button" type={buttonType} disabled={disabled}><slot /></button>
+  )
+}

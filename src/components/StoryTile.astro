@@ -1,0 +1,29 @@
+---
+import type { Product } from "../data/products";
+import { sitePath } from "../lib/urls";
+import Figure from "./Figure.astro";
+
+type StoryVariant = "lead" | "standard" | "compact" | "numbered";
+
+type Props = {
+  readonly product: Product;
+  readonly variant?: StoryVariant;
+  readonly headingLevel?: "h2" | "h3";
+  readonly eager?: boolean;
+};
+
+const { product, variant = "standard", headingLevel = "h2", eager = false } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class:list={["story-tile", `story-tile--${variant}`]}>
+  <a class:list={["story-link", `story-link--${variant}`]} href={sitePath(`/gallery/${product.slug}/`)}>
+    <Figure {...product.image} variant={variant === "lead" ? "hero-16x9" : "story-4x3"} eager={eager} />
+    <div class="story-copy">
+      {variant === "numbered" && <span class="story-number" aria-hidden="true">{product.number}</span>}
+      <p class="kicker">{product.category}</p>
+      <Heading>{product.title}</Heading>
+      <p>{product.deck}</p>
+    </div>
+  </a>
+</article>

@@ -1,0 +1,19 @@
+---
+import { sitePath } from "../lib/urls";
+---
+
+<footer class="site-footer">
+  <div class="frame">
+    <div class="footer-grid">
+      <p class="footer-title">慢一点看，<span>物件会说得更多。</span></p>
+      <nav aria-label="页脚导航">
+        <ul class="footer-links">
+          <li><a href={sitePath("/")}>首页</a></li>
+          <li><a href={sitePath("/gallery/")}>产品志</a></li>
+          <li><a href={sitePath("/showcase/")}>组件样张</a></li>
+        </ul>
+      </nav>
+    </div>
+    <p class="footer-note">Web Collection · 原创产品图像与中文编辑故事 · 2026</p>
+  </div>
+</footer>
