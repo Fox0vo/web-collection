@@ -1,10 +1,15 @@
 ---
 import EditorialRibbon from "../../components/EditorialRibbon.astro";
-import StoryTile from "../../components/StoryTile.astro";
-import { brands } from "../../data/keyboards";
+import Figure from "../../components/Figure.astro";
+import ModelDialog from "../../components/ModelDialog.astro";
+import { allModels, brands } from "../../data/keyboards";
 import { resolveImage } from "../../lib/images";
 import { sitePath } from "../../lib/urls";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const modelIndices: ReadonlyMap<string, number> = new Map(
+  allModels.map((model, index) => [model.slug, index] as const),
+);
 ---
 
 <BaseLayout
@@ -14,46 +19,75 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   <header class="frame page-intro">
     <EditorialRibbon label="KEYBOARD CATALOG / LOCAL ARCHIVE" />
     <h1 class="page-title"><span>四个品牌，</span><br /><span>七组型号。</span></h1>
-    <p class="lead">从品牌进入型号，再沿页面查看全部配色与轴体版本。目录使用 41 张本地正面图，不依赖远程图床。</p>
+    <p class="lead">展开品牌查看主型号；选择型号后，可在同一页浏览全部配色、<span class="gallery-semantic-phrase">轴体与官方版本</span>。目录使用 41 张<span class="gallery-semantic-phrase">本地正面图</span>。</p>
   </header>
 
-  <div class="frame brand-catalog">
-    {
-      brands.map((brand, brandIndex) => (
-        <section
-          id={`brand-${brand.slug}`}
-          class="brand-section"
-          aria-labelledby={`brand-${brand.slug}-title`}
-          data-brand-section
-        >
-          <div class="brand-heading">
-            <EditorialRibbon label={`BRAND ${String(brandIndex + 1).padStart(2, "0")}`} />
-            <h2 id={`brand-${brand.slug}-title`}>{brand.name}</h2>
-            <p>{brand.models.length} 组型号</p>
-          </div>
-          <div class="model-grid">
-            {brand.models.map((model, modelIndex) => {
-              const representative = model.colors[0].images[0];
-              return (
-                <StoryTile
-                  href={sitePath(`/gallery/${model.slug}/`)}
-                  kicker={`${brand.name} / ${model.colors.length} 组配色`}
-                  title={model.name}
-                  deck={model.summary}
-                  image={{
-                    src: resolveImage(representative.asset),
-                    alt: representative.alt,
-                    caption: representative.caption,
-                  }}
-                  number={String(modelIndex + 1).padStart(2, "0")}
-                  variant="numbered"
-                  eager={brandIndex === 0 && modelIndex === 0}
-                />
-              );
-            })}
-          </div>
-        </section>
-      ))
-    }
-  </div>
+  <brand-catalog>
+    <div class="frame brand-catalog">
+      {
+        brands.map((brand, brandIndex) => (
+          <details
+            id={`brand-${brand.slug}`}
+            class="brand-accordion"
+            aria-labelledby={`brand-${brand.slug}-title`}
+            data-brand-section
+          >
+            <summary class="brand-summary-row">
+              <span class="brand-summary-ribbon">
+                BRAND {String(brandIndex + 1).padStart(2, "0")}
+              </span>
+              <span
+                id={`brand-${brand.slug}-title`}
+                class="brand-summary-title"
+                role="heading"
+                aria-level="2"
+              >
+                {brand.name}
+              </span>
+              <span class="brand-summary-count">{brand.models.length} 组型号</span>
+            </summary>
+
+            <ol class="model-list">
+              {brand.models.map((model, modelIndex) => {
+                const representative = model.colors[0].images[0];
+                const modelIndexValue = modelIndices.get(model.slug);
+                if (modelIndexValue === undefined) return null;
+
+                return (
+                  <li>
+                    <a
+                      class="model-entry"
+                      href={sitePath(`/gallery/${model.slug}/`)}
+                      data-model-link
+                      data-model-index={modelIndexValue}
+                    >
+                      <Figure
+                        src={resolveImage(representative.asset)}
+                        alt={representative.alt}
+                        caption={representative.caption}
+                        variant="catalog-4x3"
+                      />
+                      <span class="model-entry-copy">
+                        <span class="model-entry-number" aria-hidden="true">
+                          {String(modelIndex + 1).padStart(2, "0")}
+                        </span>
+                        <span class="kicker">{brand.name} / {model.colors.length} 组配色</span>
+                        <span class="model-entry-title" role="heading" aria-level="3">{model.name}</span>
+                        <span class="model-entry-summary">
+                          {model.slug === "mchose-k99-v3" ? (
+                            <>{model.summary.slice(0, -"冰橘轴正面图。".length)}<span class="gallery-semantic-phrase">冰橘轴正面图</span>{model.summary.slice(-1)}</>
+                          ) : model.summary}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          </details>
+        ))
+      }
+    </div>
+    <ModelDialog brands={brands} />
+  </brand-catalog>
 </BaseLayout>

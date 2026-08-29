@@ -19,25 +19,87 @@ test("renders every static route with its editorial heading", async ({ page }) =
   }
 });
 
-test("groups seven model links into four brand sections", async ({ page }) => {
+test("starts with four collapsed brand accordions containing seven model links", async ({ page }) => {
   await page.goto(sitePath("/gallery/"));
 
-  await expect(page.locator("[data-brand-section]")).toHaveCount(4);
+  const brandSections = page.locator("details[data-brand-section]");
+  await expect(brandSections).toHaveCount(4);
   await expect(page.locator("[data-model-link]")).toHaveCount(7);
-  await expect(page.getByRole("heading", { name: "SKN", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "迈从 MCHOSE", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "EPOMAKER", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "VGN", exact: true })).toBeVisible();
+  await expect(page.getByRole("group", { name: /SKN/ })).toBeVisible();
+  await expect(page.getByRole("group", { name: /迈从 MCHOSE/ })).toBeVisible();
+  await expect(page.getByRole("group", { name: /EPOMAKER/ })).toBeVisible();
+  await expect(page.getByRole("group", { name: /VGN/ })).toBeVisible();
+  await expect
+    .poll(() =>
+      brandSections.evaluateAll((sections) =>
+        sections.every((section) => section instanceof HTMLDetailsElement && !section.open),
+      ),
+    )
+    .toBe(true);
 });
 
-test("navigates from a model card to all static color sections", async ({ page }) => {
+test("expands only the selected brand model entries", async ({ page }) => {
   await page.goto(sitePath("/gallery/"));
 
+  const mchose = page.locator("#brand-mchose");
+  await mchose.locator("summary").click();
+
+  await expect(mchose).toHaveAttribute("open", "");
+  await expect(mchose.locator("[data-model-link]:visible")).toHaveCount(3);
+  await expect(page.locator("details[data-brand-section]:not([open]) [data-model-link]:visible")).toHaveCount(0);
+});
+
+test("opens model colors in place and returns focus after Escape", async ({ page }) => {
+  await page.goto(sitePath("/gallery/"));
+  const catalogUrl = page.url();
+  await page.locator("#brand-mchose > summary").click();
+  const opener = page.getByRole("link", { name: /G98 Pro V2/ });
+
+  await opener.click();
+
+  const dialog = page.getByRole("dialog", { name: "型号配色一览" });
+  const activePanel = dialog.locator("[data-model-dialog-panel]:not([hidden])");
+  await expect(page).toHaveURL(catalogUrl);
+  await expect(dialog).toBeVisible();
+  await expect(activePanel.locator("[data-model-dialog-color]")).toHaveCount(7);
+  for (const colorName of ["冰川渐变", "橙蓝", "灰蓝", "蓝色", "极夜黑", "黑莓粉", "黑紫"]) {
+    await expect(activePanel.getByRole("heading", { name: colorName, exact: true })).toBeVisible();
+  }
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(opener).toBeFocused();
+});
+
+test("keeps every model dialog linked to its canonical fallback page", async ({ page }) => {
+  await page.goto(sitePath("/gallery/"));
+  await page.locator("#brand-mchose > summary").click();
   await page.getByRole("link", { name: /G98 Pro V2/ }).click();
 
-  await expect(page).toHaveURL(/\/gallery\/mchose-g98-pro-v2\/$/);
-  await expect(page.locator("[data-color-section]")).toHaveCount(7);
-  await expect(page.locator("#color-chenglan")).toBeVisible();
+  const dialog = page.getByRole("dialog", { name: "型号配色一览" });
+  await expect(dialog.getByRole("link", { name: /完整型号页/ })).toHaveAttribute(
+    "href",
+    sitePath("/gallery/mchose-g98-pro-v2/"),
+  );
+  const activePanel = dialog.locator("[data-model-dialog-panel]:not([hidden])");
+  const orangeBlue = activePanel.locator("[data-model-dialog-color]", { hasText: "橙蓝" });
+  await expect(orangeBlue.getByText("雪虎轴", { exact: true })).toBeVisible();
+  await expect(orangeBlue.getByText("烈焰橙轴", { exact: true })).toBeVisible();
+});
+
+test("opens a matching brand accordion from its hash", async ({ page }) => {
+  await page.goto(sitePath("/gallery/#brand-mchose"));
+
+  await expect(page.locator("#brand-mchose")).toHaveAttribute("open", "");
+  await expect(page.locator("details[data-brand-section][open]")).toHaveCount(1);
+
+  await page.locator("#brand-skn > summary").click();
+  await page.evaluate(() => {
+    window.location.hash = "#brand-vgn";
+  });
+
+  await expect(page.locator("#brand-vgn")).toHaveAttribute("open", "");
+  await expect(page.locator("details[data-brand-section][open]")).toHaveCount(1);
 });
 
 test("labels every local variant in a multi-image color", async ({ page }) => {
@@ -51,12 +113,17 @@ test("labels every local variant in a multi-image color", async ({ page }) => {
 
 test("loads every inline keyboard image after scrolling it into view", async ({ page }) => {
   const routes = [
-    { path: "/gallery/", selector: ".figure img" },
+    { path: "/gallery/", selector: "details[data-brand-section] .figure img" },
     { path: "/gallery/mchose-g98-pro-v2/", selector: ".lightbox-trigger img" },
   ] as const;
 
   for (const route of routes) {
     await page.goto(sitePath(route.path));
+    if (route.path === "/gallery/") {
+      const summaries = page.locator("details[data-brand-section] > summary");
+      const summaryCount = await summaries.count();
+      for (let index = 0; index < summaryCount; index += 1) await summaries.nth(index).click();
+    }
     const images = page.locator(route.selector);
     const imageCount = await images.count();
     expect(imageCount).toBeGreaterThan(0);
