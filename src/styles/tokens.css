@@ -1,0 +1,53 @@
+:root {
+  --color-paper: #ffffff;
+  --color-ink: #18181b;
+  --color-ink-soft: #45454d;
+  --color-caption: #73737d;
+  --color-rule: #d9d9df;
+  --color-rule-strong: #18181b;
+  --color-link: #057dbc;
+  --color-inverse: #ffffff;
+  --color-footer: #18181b;
+
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --font-reading: "Source Serif 4", Georgia, serif;
+  --font-ui: Arial, "Helvetica Neue", sans-serif;
+  --font-meta: SFMono-Regular, Consolas, "Liberation Mono", monospace;
+
+  --type-display: clamp(3rem, 8vw, 6.5rem);
+  --type-page-title: clamp(2.5rem, 6vw, 5rem);
+  --type-feature-title: clamp(2rem, 4vw, 3.5rem);
+  --type-story-title: clamp(1.45rem, 2.2vw, 2.1rem);
+  --type-lead: 1.25rem;
+  --type-body: 1rem;
+  --type-ui: 0.875rem;
+  --type-meta: 0.75rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --page-gutter: var(--space-4);
+
+  --motion-micro: 150ms;
+  --motion-standard: 240ms;
+  --motion-entry: 400ms;
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-gutter: var(--space-6);
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --page-gutter: var(--space-12);
+  }
+}

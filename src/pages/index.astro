@@ -1,0 +1,43 @@
+---
+import EditorialRibbon from "../components/EditorialRibbon.astro";
+import OutlineButton from "../components/OutlineButton.astro";
+import StoryTile from "../components/StoryTile.astro";
+import { products } from "../data/products";
+import { sitePath } from "../lib/urls";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const leadProduct = products[0];
+---
+
+<BaseLayout
+  title="Web Collection｜安静的产品视觉志"
+  description="以原创图像和中文编辑故事，记录值得被认真观看的日常物件。"
+>
+  <section class="frame home-hero" aria-labelledby="home-title">
+    <div>
+      <EditorialRibbon label="ISSUE 001 / OBJECTS IN QUIET" />
+      <h1 id="home-title" class="display-title"><span>物件，</span><br /><span>被认真观看。</span></h1>
+      <p class="lead">
+        Web Collection 是一册缓慢更新的产品视觉志。这里不排列价格与参数，而是记⁠录材料如何连接、光如何落下，以及一个物件为何值得留在身边。
+      </p>
+    </div>
+    <div>
+      <p class="hero-note">本期收录四件虚构但可被制造的日常物件。所有图像均为本站原创 SVG，不依赖外部图床。</p>
+      <OutlineButton href={sitePath("/gallery/")}>阅读本期产品志</OutlineButton>
+    </div>
+  </section>
+
+  <section class="frame page-section" aria-labelledby="feature-title">
+    <EditorialRibbon label="FEATURE / 本期封面" />
+    <h2 id="feature-title" class="section-heading">光不必填满房间。</h2>
+    <StoryTile product={leadProduct} variant="lead" eager />
+  </section>
+
+  <section class="frame page-section" aria-labelledby="index-title">
+    <EditorialRibbon label="INDEX / 四件物品" />
+    <h2 id="index-title" class="section-heading">从光线，到时间。</h2>
+    <div class="home-index">
+      {products.map((product) => <StoryTile product={product} variant="compact" />)}
+    </div>
+  </section>
+</BaseLayout>

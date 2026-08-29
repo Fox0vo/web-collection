@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">叠光灯产品插画</title>
+  <desc id="desc">黑色支架托住赭红与米白折面灯罩，暖黄色光落在桌面。</desc>
+  <rect width="1200" height="900" fill="#eee9df"/>
+  <rect y="690" width="1200" height="210" fill="#d5cec0"/>
+  <path d="M560 680h80l-8-390h-64z" fill="#252527"/>
+  <path d="M426 650h348l38 40H388z" fill="#252527"/>
+  <path d="M356 252h314l-76 258H270z" fill="#a94d36"/>
+  <path d="M670 252h174l86 258H594z" fill="#f5e5bd"/>
+  <path d="M594 510h336l-84 92H520z" fill="#e6b957"/>
+  <path d="M356 252l238 258 76-258z" fill="#793528"/>
+  <circle cx="600" cy="280" r="28" fill="#d8a340"/>
+</svg>

@@ -1,0 +1,73 @@
+---
+import EditorialRibbon from "../components/EditorialRibbon.astro";
+import Figure from "../components/Figure.astro";
+import Lightbox from "../components/Lightbox.astro";
+import OutlineButton from "../components/OutlineButton.astro";
+import StoryTile from "../components/StoryTile.astro";
+import TagList from "../components/TagList.astro";
+import { products } from "../data/products";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const sample = products[1];
+const lightboxItems = products.slice(0, 2).map((product) => ({
+  ...product.image,
+  label: product.title,
+}));
+---
+
+<BaseLayout
+  title="组件样张｜Web Collection"
+  description="Web Collection 设计系统的可访问组件、状态与响应式样张。"
+  noindex
+>
+  <header class="frame showcase-intro">
+    <EditorialRibbon label="PRIMITIVE SHOWCASE / NOINDEX" />
+    <h1 class="page-title"><span>印刷规则</span><br /><span>构成的界面原件。</span></h1>
+    <p class="lead">此页用于检查组件的键盘焦点、长中文换行、空状态、按钮状态与原生对话框交互。</p>
+  </header>
+
+  <div class="frame showcase-grid">
+    <section class="showcase-module" aria-labelledby="ribbon-title">
+      <h2 id="ribbon-title">EditorialRibbon</h2>
+      <EditorialRibbon label="SECTION / 静态栏目标签" />
+    </section>
+
+    <section class="showcase-module" aria-labelledby="buttons-title">
+      <h2 id="buttons-title">TextLink 与 OutlineButton</h2>
+      <div class="showcase-actions">
+        <OutlineButton>可操作按钮</OutlineButton>
+        <OutlineButton disabled>停用按钮</OutlineButton>
+        <a class="text-link" href="#figure-title">带下划线的文字链接</a>
+      </div>
+    </section>
+
+    <section class="showcase-module" aria-labelledby="tags-title">
+      <h2 id="tags-title">TagList：常规与空状态</h2>
+      <TagList tags={sample.tags} />
+      <TagList tags={[]} label="空标签列表" />
+    </section>
+
+    <section class="showcase-module" aria-labelledby="figure-title">
+      <h2 id="figure-title">Figure：固定比例与说明</h2>
+      <Figure {...sample.image} variant="story-4x3" />
+    </section>
+
+    <section class="showcase-module" aria-labelledby="story-title">
+      <h2 id="story-title">StoryTile：紧凑样式</h2>
+      <StoryTile product={sample} variant="compact" headingLevel="h3" />
+    </section>
+
+    <section class="showcase-module" aria-labelledby="long-title">
+      <h2 id="long-title">长文本与 CJK 换行</h2>
+      <p class="long-copy">
+        一段很长的中文标题或材料说明需要自然换行，而不是挤压相邻栏目；同时也要允许像 WEB-COLLECTION-OBJECT-REFERENCE-2026-ULTRA-LONG-IDENTIFIER 这样的连续标识在窄屏内安全折行。
+      </p>
+    </section>
+  </div>
+
+  <section class="frame page-section" aria-labelledby="lightbox-title">
+    <EditorialRibbon label="DIALOG / 键盘状态" />
+    <h2 id="lightbox-title" class="section-heading">Lightbox：Enter 打开，<br />方向键切换；<br />Escape 关闭。</h2>
+    <Lightbox items={lightboxItems} label="组件样张图像浏览器" />
+  </section>
+</BaseLayout>

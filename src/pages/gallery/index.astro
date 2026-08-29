@@ -1,0 +1,40 @@
+---
+import EditorialRibbon from "../../components/EditorialRibbon.astro";
+import Lightbox from "../../components/Lightbox.astro";
+import StoryTile from "../../components/StoryTile.astro";
+import { products } from "../../data/products";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const leadProduct = products[0];
+const secondaryProducts = products.slice(1);
+const lightboxItems = products.map((product) => ({
+  ...product.image,
+  label: product.title,
+}));
+---
+
+<BaseLayout
+  title="产品志｜Web Collection"
+  description="浏览 Web Collection 第一期的四件原创产品：叠光灯、粒波收音机、回线椅与墨刻钟。"
+>
+  <header class="frame page-intro">
+    <EditorialRibbon label="GALLERY / ISSUE 001" />
+    <h1 class="page-title"><span>四件物品，</span><br /><span>四段安静的用途。</span></h1>
+    <p class="lead">这不是购买清单。每一件物品都从一个具体动作出发：读一页书、寻找一个电⁠台、坐下来，或抬头看时间。</p>
+  </header>
+
+  <div class="frame gallery-layout">
+    <div>
+      <StoryTile product={leadProduct} variant="lead" eager />
+    </div>
+    <div class="gallery-secondary">
+      {secondaryProducts.map((product) => <StoryTile product={product} variant="numbered" />)}
+    </div>
+  </div>
+
+  <section class="frame image-index" aria-labelledby="image-index-title">
+    <EditorialRibbon label="LIGHTBOX / 图像索引" />
+    <h2 id="image-index-title" class="section-heading">放大看见材料与结构。</h2>
+    <Lightbox items={lightboxItems} />
+  </section>
+</BaseLayout>
