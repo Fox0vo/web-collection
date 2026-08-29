@@ -6,11 +6,11 @@
 - UI/UX Pro Max: queried `editorial product image gallery` with balanced variance, subtle motion, and standard density. Applied the verified focus, keyboard navigation, responsive-image, and static-Astro guidance.
 - Stack research: Astro guidance confirms static `.astro` components and optimized local imagery through `astro:assets`; responsive image sources are used when art direction is needed.
 - Lazyweb: skipped because the design references above establish the required editorial grammar without copying a live product screen.
-- Imagen drafts: skipped because image-generation tooling is unavailable in this session; the first version uses original locally generated SVG artwork and image geometry as the visual contract.
+- Imagen drafts: skipped because image-generation tooling is unavailable in this session; the catalog now uses the supplied local keyboard front-image inventory as its visual contract.
 
 ## 1. Atmosphere & Identity
 
-Web Collection is a quiet product journal: a paper-white reading surface where products are introduced as visual stories rather than sales units. Its signature is the **print spread**: square photography, black editorial rules, mono section labels, and large serif titles in asymmetric image-and-prose compositions. It should feel like a useful magazine catalogue, not a storefront or a SaaS dashboard.
+Web Collection is a quiet keyboard catalog: a paper-white reading surface where real models and color variants are indexed rather than sold. Its signature is the **print spread**: front-view product photography, black editorial rules, mono section labels, and large serif titles in asymmetric image-and-prose compositions. It should feel like a useful magazine catalogue, not a storefront or a SaaS dashboard.
 
 ## 2. Color
 
@@ -30,7 +30,7 @@ Web Collection is a quiet product journal: a paper-white reading surface where p
 
 ### Rules
 
-- Chrome uses only paper, ink, grays, and link blue. Product artwork supplies any additional color.
+- Chrome uses only paper, ink, grays, and link blue. Keyboard imagery supplies any additional color.
 - `--color-link` never becomes a decorative fill or a broad page background.
 - No raw color values appear in components; all components consume these tokens.
 - Contrast meets WCAG 2.2 AA: 4.5:1 for regular text and 3:1 for large text and non-text indicators.
@@ -51,7 +51,7 @@ Web Collection is a quiet product journal: a paper-white reading surface where p
 | Display | `--type-display` | `clamp(3rem, 8vw, 6.5rem)` | `0.98` | Home and feature titles |
 | Page title | `--type-page-title` | `clamp(2.5rem, 6vw, 5rem)` | `1.02` | Gallery title |
 | Feature title | `--type-feature-title` | `clamp(2rem, 4vw, 3.5rem)` | `1.05` | Lead story |
-| Story title | `--type-story-title` | `clamp(1.45rem, 2.2vw, 2.1rem)` | `1.12` | Product story heading |
+| Story title | `--type-story-title` | `clamp(1.45rem, 2.2vw, 2.1rem)` | `1.12` | Model card heading |
 | Lead | `--type-lead` | `1.25rem` | `1.55` | Page introduction |
 | Body | `--type-body` | `1rem` | `1.65` | Article prose |
 | UI | `--type-ui` | `0.875rem` | `1.3` | Navigation and links |
@@ -112,12 +112,20 @@ All intent spacing derives from 4px.
 - States: default, link hover, visible focus, active.
 - Accessibility: a single descriptive link target, non-empty image alt text, headline remains useful when image fails.
 - Motion: text color and underline only; images do not zoom, lift, or gain shadows.
+- Catalog usage: props remain content-agnostic so brand/model records can supply the link, kicker, title, summary, and resolved local image metadata.
 
 ### Figure
 
 - Structure: semantic `<figure>` with responsive image, fixed aspect-ratio wrapper, caption.
-- Variants: `hero-16x9`, `story-4x3`, `detail-portrait`, `detail-landscape`.
+- Variants: `hero-16x9`, `story-4x3`, `catalog-4x3`, `detail-portrait`, `detail-landscape`.
 - Accessibility: explicit width/height or aspect ratio reserves layout space; decorative artwork uses empty alt; meaningful imagery uses specific alt.
+- Keyboard treatment: `catalog-4x3` and `detail-landscape` use `object-fit: contain` so the complete front view remains visible.
+
+### Brand and Color Sections
+
+- Catalog index: one semantic `<section>` per brand, each with a labelled heading and model-link grid.
+- Model page: one anchored `<section id="color-<slug>">` per color; every local image variant is visible inside its color section without client-side filtering.
+- Multi-image colors: each switch or official-image variant is named in selectable text and its figure caption.
 
 ### TagList
 
@@ -169,7 +177,7 @@ All intent spacing derives from 4px.
 - Rectangular surfaces use `border-radius: 0`.
 - No box shadows, gradients, glass effects, glow, rounded cards, or floating panels.
 - Separation uses white space, a `1px` quiet rule, a `1px` ink structural rule, or a `2px` ink interactive border.
-- Black fill is reserved for ribbons and the footer. Product images, not UI chrome, provide dimensional depth.
+- Black fill is reserved for ribbons and the footer. Keyboard images, not UI chrome, provide dimensional depth.
 
 ## 8. Accessibility Constraints & Accepted Debt
 
@@ -183,6 +191,4 @@ All intent spacing derives from 4px.
 
 ### Accepted Debt
 
-| Item | Location | Why accepted | Owner / Exit |
-| --- | --- | --- | --- |
-| Initial product imagery is original local SVG artwork rather than photography | Gallery seed content | No licensed product photography was supplied | Replace per product entry when licensed assets are available |
+- None for the local catalog migration. The supplied inventory is copied into `src/assets/keyboards/`, and runtime pages contain no remote image or source-attribution URLs.
