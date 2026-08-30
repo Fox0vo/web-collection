@@ -2,39 +2,40 @@
 import EditorialRibbon from "../components/EditorialRibbon.astro";
 import OutlineButton from "../components/OutlineButton.astro";
 import StoryTile from "../components/StoryTile.astro";
-import { brands } from "../data/keyboards";
+import { brandCount, brands, colorVariantCount, modelCount } from "../data/keyboards";
 import { resolveImage } from "../lib/images";
 import { sitePath } from "../lib/urls";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const leadModel = brands[1].models[0];
 const leadImage = leadModel.colors[0].images[0];
+const leadImageCount = leadModel.colors.reduce((count, color) => count + color.images.length, 0);
 ---
 
 <BaseLayout
-  title="Web Collection｜本地键盘目录"
-  description="按 4 个品牌、7 组型号与 27 组配色浏览 41 张本地键盘正面图。"
+  title="Web Collection｜键盘品牌档案"
+  description="按品牌、型号与配色整理的键盘收藏，从首页进入图库逐一浏览。"
 >
   <section class="frame home-hero" aria-labelledby="home-title">
     <div>
-      <EditorialRibbon label="LOCAL KEYBOARD ARCHIVE / 2026" />
+      <EditorialRibbon label="KEYBOARD ARCHIVE / 键盘收藏" />
       <h1 id="home-title" class="display-title"><span>键盘，</span><br /><span>按品牌归档。</span></h1>
-      <p class="lead">从品牌选择型号，再查看该型号的全部配色、轴体或官方图片版本。所有条目均来自本站随附的本地正面图清单。</p>
+      <p class="lead">一处按品牌、型号与配色整理的<span class="nowrap">键盘收藏</span>。从这里走进图库，逐把细看<span class="nowrap">它们的外观与配色</span>。</p>
     </div>
     <div>
-      <p class="hero-note">4 个品牌 · 7 组型号 · 27 组配色 · 41 张正面图。没有远程图片，也不补写清单之外的规格。</p>
-      <OutlineButton href={sitePath("/gallery/")}>浏览键盘目录</OutlineButton>
+      <p class="hero-note">{brandCount} 个品牌，{modelCount} 组型号，{colorVariantCount} 组配色。<span class="nowrap">每一把</span>都配有<span class="nowrap">正面图</span>，方便逐一对照。</p>
+      <OutlineButton href={sitePath("/gallery/")}>浏览键盘图库</OutlineButton>
     </div>
   </section>
 
   <section class="frame page-section" aria-labelledby="feature-title">
-    <EditorialRibbon label="FEATURE / 多版本型号" />
-    <h2 id="feature-title" class="section-heading">同一配色，也可能拥有不同轴体版本。</h2>
+    <EditorialRibbon label="FEATURED STORY / 本期精选" />
+    <h2 id="feature-title" class="section-heading">从一把键盘开始，细看型号与配色。</h2>
     <StoryTile
       href={sitePath(`/gallery/${leadModel.slug}/`)}
       kicker={`${brands[1].name} / ${leadModel.colors.length} 组配色`}
       title={leadModel.name}
-      deck={leadModel.summary}
+      deck={`收录 ${leadModel.colors.length} 组配色、${leadImageCount} 张正面图。`}
       image={{ src: resolveImage(leadImage.asset), alt: leadImage.alt, caption: leadImage.caption }}
       variant="lead"
       eager
@@ -42,8 +43,8 @@ const leadImage = leadModel.colors[0].images[0];
   </section>
 
   <section class="frame page-section" aria-labelledby="index-title">
-    <EditorialRibbon label="INDEX / 四个品牌" />
-    <h2 id="index-title" class="section-heading">先按品牌，再进入型号。</h2>
+    <EditorialRibbon label="BRAND INDEX / 品牌索引" />
+    <h2 id="index-title" class="section-heading">按品牌翻阅这份键盘档案。</h2>
     <div class="home-index">
       {
         brands.map((brand) => (

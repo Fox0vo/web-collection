@@ -12,6 +12,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const sampleBrand = brands[1];
 const sample = sampleBrand.models[1];
+const sampleImageCount = sample.colors.reduce((total, color) => total + color.images.length, 0);
 const sampleColor = sample.colors[0];
 const sampleImage = sampleColor.images[0];
 const lightboxItems = sampleColor.images.map((image) => ({
@@ -31,7 +32,7 @@ const lightboxItems = sampleColor.images.map((image) => ({
   <header class="frame showcase-intro">
     <EditorialRibbon label="PRIMITIVE SHOWCASE / NOINDEX" />
     <h1 class="page-title"><span>印刷规则</span><br /><span>构成的界面原件。</span></h1>
-    <p class="lead">此页用于检查组件的键盘焦点、长中文换行、空状态、按钮状态与原生对话框交互。</p>
+    <p class="lead">此页用于检查组件的键盘焦点、<span class="nowrap">长中文换行</span>、空状态、<span class="nowrap">按钮状态与原生对话框交互</span>。</p>
   </header>
 
   <div class="frame showcase-grid">
@@ -71,7 +72,7 @@ const lightboxItems = sampleColor.images.map((image) => ({
         href={sitePath(`/gallery/${sample.slug}/`)}
         kicker={sampleBrand.name}
         title={sample.name}
-        deck={sample.summary}
+        deck={`收录 ${sample.colors.length} 组配色，共 ${sampleImageCount} 张正面图。`}
         image={{ src: resolveImage(sampleImage.asset), alt: sampleImage.alt, caption: sampleImage.caption }}
         variant="compact"
         headingLevel="h3"
@@ -81,7 +82,7 @@ const lightboxItems = sampleColor.images.map((image) => ({
     <section class="showcase-module" aria-labelledby="long-title">
       <h2 id="long-title">长文本与 CJK 换行</h2>
       <p class="long-copy">
-        一段很长的中文标题或材料说明需要自然换行，而不是挤压相邻栏目；同时也要允许像 WEB-COLLECTION-KEYBOARD-REFERENCE-2026-ULTRA-LONG-IDENTIFIER 这样的连续标识在窄屏内安全折行。
+        一段很长的中文标题或材料说明需要<span class="nowrap">自然换行</span>，而不是挤压相邻栏目；WEB-COLLECTION-KEYBOARD-REFERENCE-2026-ULTRA-LONG-IDENTIFIER 这样的连续标识也应在窄屏内安全折行。
       </p>
     </section>
   </div>
