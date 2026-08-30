@@ -21,8 +21,16 @@ const viewports = [
 
 const sitePath = (path: string): string => `/web-collection${path}`;
 
-const preloadVisibleInlineImages = async (page: Page): Promise<void> => {
+const preloadVisibleInlineImages = async (page: Page, restoreTop = true): Promise<void> => {
   const images = page.locator("main img:visible");
+  await page.locator("main img").evaluateAll((elements) => {
+    for (const element of elements) {
+      if (element instanceof HTMLImageElement) {
+        element.loading = "eager";
+        element.fetchPriority = "high";
+      }
+    }
+  });
   const imageCount = await images.count();
 
   for (let index = 0; index < imageCount; index += 1) {
@@ -37,12 +45,25 @@ const preloadVisibleInlineImages = async (page: Page): Promise<void> => {
       )
       .toBe(true);
     await image.evaluate(async (element) => {
-      if (element instanceof HTMLImageElement) await element.decode();
+      if (element instanceof HTMLImageElement) {
+        await element.decode();
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        });
+      }
     });
   }
 
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  if (restoreTop) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  }
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
 };
 
 test("captures every page and required viewport", async ({ page }) => {
@@ -50,7 +71,7 @@ test("captures every page and required viewport", async ({ page }) => {
     await page.setViewportSize(viewport);
     for (const route of routes) {
       await page.goto(sitePath(route.path));
-      await preloadVisibleInlineImages(page);
+      await preloadVisibleInlineImages(page, false);
       await page.screenshot({
         path: `.omo/evidence/keyboard-catalog/${route.slug}-${viewport.width}.png`,
         fullPage: true,
@@ -65,7 +86,7 @@ test("captures expanded brand accordions at every required viewport", async ({ p
     await page.setViewportSize(viewport);
     await page.goto(sitePath("/gallery/"));
     await page.locator("#brand-vgn > summary").click();
-    await preloadVisibleInlineImages(page);
+    await preloadVisibleInlineImages(page, false);
     await page.screenshot({
       path: `.omo/evidence/keyboard-catalog/gallery-${viewport.width}-accordion-expanded.png`,
       fullPage: true,
