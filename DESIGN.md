@@ -1,207 +1,196 @@
-# Web Collection Design System
+# Web Collection Redesign Foundation
 
 ## 0. Research Log
 
-- Embedded references: shortlisted Notion, WIRED, and Claude. Selected the restraint of `minimalist-skill.md` with WIRED's paper-and-rule editorial grammar, adapted into an original product collection without copied branding, logo, or copy.
-- UI/UX Pro Max: queried `editorial product image gallery` with balanced variance, subtle motion, and standard density. Applied the verified focus, keyboard navigation, responsive-image, and static-Astro guidance.
-- Stack research: Astro guidance confirms static `.astro` components and optimized local imagery through `astro:assets`; responsive image sources are used when art direction is needed.
-- Lazyweb: skipped because the design references above establish the required editorial grammar without copying a live product screen.
-- Imagen drafts: skipped because image-generation tooling is unavailable in this session; the catalog now uses the supplied local keyboard front-image inventory as its visual contract.
+### Observed reference facts
 
-## 1. Atmosphere & Identity
+- Playwright captures inspected at 375px, 768px, and 1280px (`mchose-connect-375.png`, `mchose-connect-768.png`, and `mchose-connect-1280.png`) showed a 60px transparent header over an `rgb(230, 231, 237)` canvas.
+- The reference centers sparse content inside a white panel with approximately 8-12px corner radii. Typography is sans-serif, one bright color carries actions, there is no visible shadow, and large whitespace isolates the product.
+- The user-supplied device-card screenshot clarifies the selector anatomy: a pale neutral canvas holds large white, image-first cards with approximately 12px radii, near-black model titles, and compact factual metadata below the image. Fresh visual QA found the system coherent but the current captions and metadata too small and low-contrast.
+- The captures also exposed a fixed/min-width 1440px responsive defect: narrow viewports show a desktop-width composition rather than a true reflow. That defect is evidence, not a behavior to copy.
 
-Web Collection is a quiet keyboard catalog: a paper-white reading surface where real models and color variants are indexed rather than sold. Its signature is the **print spread**: front-view product photography, black editorial rules, mono section labels, and large serif titles in asymmetric image-and-prose compositions. It should feel like a useful magazine catalogue, not a storefront or a SaaS dashboard.
+### Adaptation decision
 
-## 2. Color
+- This is an original, simpler adaptation of the reference's hierarchy: quiet blue-gray canvas, white product surfaces, sparse centered product imagery, restrained rounded geometry, and one action blue.
+- The reference is not a pixel-clone contract. Do not copy MCHOSE's logo, exact blue, product copy, assets, proprietary icons, toolbar pattern, or defective fixed-width layout.
+- Deliberate omissions: no wallpaper or media backgrounds, utility-icon toolbar clutter, theme switch, gradients, glass, shadows, glow, decorative motion, or dark mode.
+- Existing audit: the project is static Astro with vanilla global CSS, a 4px spacing scale, semantic shared components, local optimized images, native disclosure/dialog behavior, and progressive enhancement. This redesign changes the documented and shared styling foundation without changing markup or route data.
 
-### Palette
+## 1. Product Intent and Route Roles
 
-| Role | Token | Value | Usage |
+Web Collection has two related visual roles, not one template stretched across every route:
+
+| Route | Role | Content priority | Visual behavior |
 | --- | --- | --- | --- |
-| Paper | `--color-paper` | `#ffffff` | Page canvas and cards |
-| Ink | `--color-ink` | `#18181b` | Headings, rules, controls |
-| Ink soft | `--color-ink-soft` | `#45454d` | Long-form body text |
-| Caption | `--color-caption` | `#73737d` | Metadata and captions |
-| Rule | `--color-rule` | `#d9d9df` | Quiet separators |
-| Rule strong | `--color-rule-strong` | `#18181b` | Editorial boundaries and buttons |
-| Link | `--color-link` | `#057dbc` | Text-link hover and focus accent only |
-| Inverse | `--color-inverse` | `#ffffff` | Text on the footer/ribbon |
-| Footer | `--color-footer` | `#18181b` | Inverted footer and section ribbons |
+| `/` | Blog/archive start page | Orient, summarize, and route into the collection | Reading-first hierarchy, archive-like modules, editorial cadence, and more visible text than product routes |
+| `/gallery/` | Primary product showcase and device selector | Compare keyboard families and choose a model | Product-facing introduction, sparse controls, centered imagery, calm white product panels, and clear model actions |
+| `/gallery/[model]/` | Full product detail and canonical fallback | Show every color and local image variant | Complete model information, anchored color sections, contained product images, and a reliable destination when enhancement is unavailable |
+| `/showcase/` | Internal primitive proof | Verify shared primitives and states | `noindex`; demonstrates default, hover, active, focus, disabled, empty, long-copy, and responsive states before route-specific composition |
 
-### Rules
+The home page keeps a blog/archive voice. Gallery and model pages adopt the simpler connect-device-inspired product-showcase grammar. Shared primitives bridge the roles through typography, color, spacing, and state consistency rather than forcing identical layouts.
 
-- Chrome uses only paper, ink, grays, and link blue. Keyboard imagery supplies any additional color.
-- `--color-link` never becomes a decorative fill or a broad page background.
-- No raw color values appear in components; all components consume these tokens.
-- Contrast meets WCAG 2.2 AA: 4.5:1 for regular text and 3:1 for large text and non-text indicators.
+## 2. Color Tokens
+
+### Primitive and semantic palette
+
+| Role | Token | Value | Contract |
+| --- | --- | --- | --- |
+| Canvas | `--color-canvas` | `#e9edf3` | Original, slightly darker neutral blue-gray page field |
+| Surface | `--color-surface` | `#ffffff` | Primary panels and large model cards |
+| Muted surface | `--color-surface-muted` | `#f5f7fa` | Inner product-image wells, quiet tags, and fallback contrast |
+| Text | `--color-text` | `#161a22` | Near-black headings, body, and controls |
+| Muted text | `--color-text-muted` | `#4e5a68` | Supporting copy and captions; remains AA-readable on canvas and surface |
+| Border | `--color-border` | `#d8dee7` | Subtle surface and component boundaries |
+| Strong border | `--color-border-strong` | `#99a5b3` | Controls and structural states requiring more definition |
+| Accent | `--color-accent` | `#1d61d6` | Original action/link blue, intentionally not MCHOSE brand blue |
+| Accent hover | `--color-accent-hover` | `#164da9` | Hover/pressed action state |
+| Inverse text | `--color-inverse` | `#ffffff` | Text on accent or inverse surfaces |
+| Inverse surface | `--color-inverse-surface` | `#161a22` | Existing footer and rare high-contrast utility surfaces |
+
+Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-caption`, `--color-rule`, `--color-rule-strong`, `--color-link`, and `--color-footer`) remain aliases so untouched styles stay valid. New work uses semantic names.
+
+### Color rules
+
+- The page canvas is neutral blue-gray; cards are white; their inner product-image wells use the lighter muted surface. Tonal contrast and borders provide separation, never shadow.
+- Accent is functional: links, selected/action states, and focus. It is not a broad background decoration.
+- Regular text and control states meet WCAG 2.2 AA: at least 4.5:1 for normal text and 3:1 for large text and non-text indicators.
+- Raw colors belong only in `tokens.css`; component CSS consumes custom properties.
 
 ## 3. Typography
 
 ### Families
 
-- Display serif: `Iowan Old Style`, `Palatino Linotype`, `Book Antiqua`, serif.
-- Reading serif: `Source Serif 4`, `Georgia`, serif.
-- UI sans: `Arial`, `Helvetica Neue`, sans-serif.
-- Metadata mono: `SFMono-Regular`, `Consolas`, `Liberation Mono`, monospace.
+- All typography is local/system sans. No remote font requests are allowed.
+- `--font-sans` uses the native UI stack, with CJK glyph fallback prioritizing `PingFang SC`, `Microsoft YaHei`, `Noto Sans CJK SC`, and compatible system sans.
+- Existing family tokens (`--font-display`, `--font-reading`, `--font-ui`, and `--font-meta`) alias the same sans stack. Hierarchy comes from size, weight, and spacing rather than mixing serif and mono families.
 
-### Scale
+### Restrained scale
 
-| Role | Token | Size | Line height | Usage |
+| Role | Token | Size | Line height | Weight |
 | --- | --- | --- | --- | --- |
-| Display | `--type-display` | `clamp(3rem, 8vw, 6.5rem)` | `0.98` | Home and feature titles |
-| Page title | `--type-page-title` | `clamp(2.5rem, 6vw, 5rem)` | `1.02` | Gallery title |
-| Feature title | `--type-feature-title` | `clamp(2rem, 4vw, 3.5rem)` | `1.05` | Lead story |
-| Story title | `--type-story-title` | `clamp(1.45rem, 2.2vw, 2.1rem)` | `1.12` | Model card heading |
-| Lead | `--type-lead` | `1.25rem` | `1.55` | Page introduction |
-| Body | `--type-body` | `1rem` | `1.65` | Article prose |
-| UI | `--type-ui` | `0.875rem` | `1.3` | Navigation and links |
-| Meta | `--type-meta` | `0.75rem` | `1.35` | Kicker, date, image caption |
+| Display | `--type-display` | `clamp(2.5rem, 6vw, 4.75rem)` | tight | 600 |
+| Page title | `--type-page-title` | `clamp(2.25rem, 5vw, 4rem)` | tight | 600 |
+| Feature title | `--type-feature-title` | `clamp(1.75rem, 3.5vw, 2.75rem)` | tight | 600 |
+| Story title | `--type-story-title` | `clamp(1.25rem, 2vw, 1.75rem)` | tight | 600 |
+| Lead | `--type-lead` | `1.125rem` | body | 400 |
+| Body | `--type-body` | `1rem` | body | 400 |
+| UI | `--type-ui` | `0.9375rem` | UI | 600 |
+| Meta | `--type-meta` | `0.875rem` | UI | 500 |
 
-### Rules
+- Body text never drops below 16px. Text measures remain approximately 42-70ch for Latin-heavy prose.
+- Headings use balanced wrapping. Chinese text uses `line-break: strict`, readable system CJK fonts, and phrase-safe wrapping; body copy receives no forced tracking.
+- Labels use sentence case or restrained uppercase only when existing content already requires it. Avoid faux-technical mono styling.
 
-- Mono metadata is uppercase with `0.1em` tracking; product names and prose never use mono.
-- Headlines use display serif with slightly negative tracking; reading text uses the reading serif.
-- Chinese text may use the browser's CJK serif fallback. Do not force letter spacing in body copy; use `text-wrap: pretty` with `line-break: strict` on headings and reading text, plus narrowly scoped no-wrap phrase spans where needed.
-- Body text never falls below 16px, and a readable article measure stays between 42ch and 70ch where Latin text is dominant.
+## 4. Spacing, Geometry, and Responsive Layout
 
-## 4. Spacing & Layout
+### Spacing and control contracts
 
-### Base Unit
+- All intentional spacing derives from the retained 4px scale: `--space-1` (4px), `--space-2` (8px), `--space-3` (12px), `--space-4` (16px), `--space-6` (24px), `--space-8` (32px), `--space-12` (48px), `--space-16` (64px), and `--space-24` (96px).
+- Page gutters remain 16px at 375px, 24px from 768px, and 48px from 1280px.
+- Controls retain a 44px minimum block size. Focus uses a visible 2px accent outline with 4px offset.
+- `--radius-sm` is 8px for controls, labels, and inner media; `--radius-md` is 12px for cards and panels. Do not introduce pills or larger ornamental radii.
 
-All intent spacing derives from 4px.
+### Fluid behavior
 
-| Token | Value | Usage |
-| --- | --- | --- |
-| `--space-1` | 4px | Kicker-to-title |
-| `--space-2` | 8px | Inline metadata |
-| `--space-3` | 12px | Caption spacing |
-| `--space-4` | 16px | Mobile gutter |
-| `--space-6` | 24px | Story gaps |
-| `--space-8` | 32px | Module padding |
-| `--space-12` | 48px | Editorial section gap |
-| `--space-16` | 64px | Desktop module gap |
-| `--space-24` | 96px | Major page break |
+- The content frame remains `min(100% - 2 * var(--page-gutter), 1440px)`, but no child may establish a 1440px minimum width.
+- At 375px: one fluid column, 16px gutters, product media fully contained, controls wrap without clipping, and primary content never scrolls horizontally.
+- At 768px: layouts may use two columns where content supports comparison; text and product media retain flexible `minmax(0, 1fr)` tracks.
+- At 1280px: whitespace increases, product imagery may take visual priority, and grids may expand without fixing the viewport or stretching reading measures.
+- The implementation must genuinely reflow at 375/768/1280. The reference's fixed/min-width 1440px failure must never be reproduced.
 
-### Layout Rules
-
-- Content frame: `min(100% - 2 * var(--page-gutter), 1440px)` with `--page-gutter` of 16px at 375px, 24px at 768px, and 48px at 1280px.
-- Desktop at 1280px: 12-column editorial grid with 24px gutters. The gallery uses one lead span plus an intentionally uneven secondary column, separated by hairline rules.
-- Tablet at 768px: two-column story flow; nav is condensed; feature story remains visually dominant.
-- Mobile at 375px: one reading column; all image/story pairs stack in source order; navigation remains fully keyboard reachable; no horizontal primary-content scroll.
-- Squares and 4:3/16:9 image ratios are semantic image treatments, not arbitrary decorative boxes.
-
-## 5. Components
-
-### SiteHeader
-
-- Structure: `<header><a brand><nav><a route links></nav><button menu></button></header>`.
-- States: default, hover, keyboard focus, active route, mobile menu open.
-- Accessibility: semantic `<nav aria-label="主导航">`, 44px minimum touch targets, visible 2px focus outline, Escape closes mobile menu, focus returns to trigger.
-- Motion: opacity and transform only; menu entry is disabled under reduced motion.
-
-### EditorialRibbon
-
-- Structure: black rectangular label with white uppercase mono text.
-- States: static only.
-- Accessibility: text remains selectable; never encodes essential meaning by color alone.
-
-### StoryTile
-
-- Structure: `<article><a><figure><img><figcaption></figure><p kicker><h2><p deck></a></article>`.
-- Variants: `lead`, `standard`, `compact`, `numbered`.
-- States: default, link hover, visible focus, active.
-- Accessibility: a single descriptive link target, non-empty image alt text, headline remains useful when image fails.
-- Motion: text color and underline only; images do not zoom, lift, or gain shadows.
-- Catalog usage: props remain content-agnostic so brand/model records can supply the link, kicker, title, summary, and resolved local image metadata.
+## 5. Shared Primitives and States
 
 ### Figure
 
-- Structure: semantic `<figure>` with responsive image, fixed aspect-ratio wrapper, caption.
-- Variants: `hero-16x9`, `story-4x3`, `catalog-4x3`, `detail-portrait`, `detail-landscape`.
-- Accessibility: explicit width/height or aspect ratio reserves layout space; decorative artwork uses empty alt; meaningful imagery uses specific alt.
-- Keyboard treatment: `catalog-4x3` and `detail-landscape` use `object-fit: contain` so the complete front view remains visible.
+- Semantic `<figure>` with a stable aspect-ratio media well and selectable caption.
+- Media wells are white or muted, 8-12px rounded, and separated by a subtle border or surface contrast only.
+- `catalog-4x3` and `detail-landscape` keyboard imagery uses `object-fit: contain`. Detail-page and Lightbox photography remains fully contained and uncropped. Only `.model-entry` and `.model-dialog-figure` media may use a bounded, static no-clip zoom to trim baked-in source whitespace; the complete keyboard edges, legends, and switch callouts must remain visible.
+- Meaningful images receive specific alt text; decorative imagery uses empty alt. Explicit image dimensions/aspect ratio reserve layout space.
 
-### Brand Accordion
+### EditorialRibbon
 
-- Structure: four vertically stacked native `<details data-brand-section>` elements; each `<summary>` contains the brand index, heading, model count, and disclosure mark, followed by that brand's model-link grid.
-- States: collapsed on initial catalog entry, expanded, and summary focus-visible. A matching `#brand-<slug>` hash opens only its target accordion as progressive enhancement.
-- Accessibility: native summary keyboard behavior is preserved, the complete summary is a 44px minimum target, and every model remains a real link to its canonical model page when JavaScript is unavailable.
-- Motion: disclosure state changes are instant. The model grid never animates height, position, or layout.
+- A quiet contextual label, not a black editorial banner: muted surface, accent text, 8px radius, compact sans label typography.
+- Static only. Text remains selectable and meaning never relies on color alone.
 
-### ModelDialog
+### StoryTile
 
-- Structure: one native `<dialog>` for the catalog, with one hidden panel per model. The active panel contains a model heading, every color, every switch or official-image variant as a `Figure` with caption, a close control, and a full-page fallback link.
-- States: closed or open with exactly one model panel visible.
-- Accessibility: model links are progressively enhanced as openers; the dialog receives the matching model panel, Escape and backdrop close it, focus moves to the close control on open, and focus returns to the invoking model link on close. Dialogs are never nested.
-- Motion: opening, closing, and model-panel changes are instant with no transient animation.
+- Semantic article with one descriptive link, Figure, kicker, heading, and summary.
+- Calm white 12px panel with subtle border and no elevation. The `lead`, `standard`, `compact`, and `numbered` markup contracts remain valid.
+- Default: dark text and border. Hover: heading/action shifts to accent hover. Active: action color deepens without layout movement. Focus-visible: the shared 2px outline is unambiguous. Images never zoom or lift.
+- Home uses StoryTile as an archive/story primitive; gallery may use the same structure as a product selector without changing markup.
 
-### Color Sections
+### Gallery Card Selector
 
-- Model page: one anchored `<section id="color-<slug>">` per color; every local image variant is visible inside its color section without client-side filtering.
-- Multi-image colors: each switch or official-image variant is named in selectable text and its figure caption.
+- Each brand remains a native expandable `<details>/<summary>` row. The row names the brand and model count; it does not imitate a device-status toolbar.
+- When a brand is expanded, its models render as large white 12px cards. Each card has an image-dominant upper area containing the complete keyboard inside a light muted well, followed by a concise factual metadata area.
+- The lower area uses a near-black model name as the primary label. Supporting metadata is limited to the brand, number of colorways, factual model summary, and a derived local-image count when useful.
+- Never invent battery percentage, connection status, availability, performance claims, color swatches, or other data not present in the catalog. Do not add copied reference icons or decorative device telemetry.
+- The card remains one clear canonical model link and retains its no-JavaScript fallback. Hover, active, and focus states follow StoryTile without interaction-triggered image zoom, lift, or shadow.
 
 ### TagList
 
-- Structure: semantic list of small text links or spans.
-- States: default, interactive hover/focus where linked, and a visible caption/mono empty state.
-- Accessibility: tags never convey status solely by shape or color.
+- Wrapped list of compact 8px rounded labels using muted surface and subtle border.
+- Default and empty states use readable muted text. Linked tags, if introduced through existing markup, use accent hover/focus and preserve a visible focus outline.
+- Tags never communicate status only by color or shape.
 
-### TextLink and OutlineButton
+### OutlineButton
 
-- Structure: native `<a>` and `<button>` only.
-- States: default, hover, active, focus-visible, disabled when applicable.
-- Accessibility: visible focus is never removed; 44px target for button controls; text links preserve an underline on hover and focus.
+- Native `<a>` or `<button>` with 44px minimum height, 8px radius, 2px accent border, white surface, and semibold sans label.
+- Hover uses accent fill with inverse text; active uses accent hover. Focus-visible keeps the global 2px outline outside the component border. Disabled uses muted text/border, remains legible, and does not imply clickability.
 
-### Lightbox
+### Existing interactive primitives
 
-- Structure: native `<dialog>` with image, caption, previous, next, and close buttons.
-- States: closed and open; the current image may change while open.
-- Accessibility: click is optional; Enter/Space opens, Escape closes, left/right navigate, focus stays within the dialog, opener receives focus on close, controls are labelled, and focus cannot sit behind the dialog.
-- Motion: the dialog appears, closes, and switches images instantly with no transient animation.
-
-### SiteFooter
-
-- Structure: inverted footer with concise route links and project note.
-- States: link hover/focus.
-- Accessibility: dark surface maintains AA contrast; route links retain visible focus.
+- SiteHeader remains semantically transparent/light and approximately one control-row high; no utility-icon toolbar is added.
+- Brand Accordion remains native `<details>/<summary>` with complete no-JavaScript access to model links. Disclosure changes are instant.
+- ModelDialog and Lightbox remain native `<dialog>` experiences. Escape/backdrop close, focus is managed and returned, controls are labelled, and image/panel changes are instant.
+- Without JavaScript, gallery model links still reach canonical model routes, native details remain operable, and all route content and figures remain readable.
 
 ### Primitive Showcase
 
-- Route: `/showcase`, excluded from indexing.
-- Shows all components and their keyboard, hover, active, long-text, empty, and mobile states before production screens are composed.
+- `/showcase/` remains internal and `noindex`.
+- It proves every shared primitive at 375px, 768px, and 1280px, including default, hover, active, keyboard focus, disabled, empty, long-copy/CJK, and reduced-motion states.
 
-## 6. Motion & Interaction
+## 6. Motion and Interaction
 
-| Type | Token | Duration | Easing | Usage |
-| --- | --- | --- | --- | --- |
-| Micro | `--motion-micro` | 150ms | `ease-out` | Link, button press |
-| Standard | `--motion-standard` | 240ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Menu |
-| Entry | `--motion-entry` | 400ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Story reveal |
+| Contract | Token | Value | Use |
+| --- | --- | --- | --- |
+| Micro | `--motion-micro` | 150ms | Color and control feedback |
+| Standard | `--motion-standard` | 240ms | Existing navigation state where retained |
+| Entry | `--motion-entry` | 400ms | Existing non-critical progressive reveal contract only |
+| Easing | `--ease-standard` | `cubic-bezier(0.16, 1, 0.3, 1)` | Existing transform/opacity transitions |
 
-- Motion communicates navigation and state; Brand Accordion, ModelDialog, and Lightbox state changes are intentionally instant, and motion is never ornamental.
-- Only `opacity`, `transform`, and carefully bounded `filter` animate. Width, height, margin, position, and layout grids never animate.
-- IntersectionObserver may reveal non-critical story modules; all content remains visible if JavaScript is unavailable.
-- Under `prefers-reduced-motion: reduce`, non-essential transitions stop and menu states render immediately; Brand Accordion, ModelDialog, and Lightbox states are already instant.
+- Motion is restrained and functional. No decorative motion, parallax, animated or interaction-triggered image zoom, lift, animated shadow, or layout animation.
+- Accordion, dialog, lightbox, and model/image changes are intentionally instant.
+- Only `transform`, `opacity`, or bounded `filter` may animate; no width, height, position, margin, padding, or grid animation.
+- Under `prefers-reduced-motion: reduce`, non-essential transition and animation duration becomes zero. Content and no-JavaScript fallbacks remain complete.
 
-## 7. Depth & Surface
+## 7. Surface and Depth
 
-### Strategy: Rules, Not Elevation
+- Strategy: tonal separation plus borders, never elevation.
+- Canvas is a slightly darker neutral blue-gray; primary content surfaces are white; inner image wells and labels use a lighter neutral muted surface so cards and products remain distinct without elevation.
+- Cards and panels use 12px radii; controls and inner media use 8px. Nested boxes are minimized.
+- No `box-shadow`, gradient, glass, blur, glow, wallpaper/media background, or dark-mode surface is permitted.
+- Product photography supplies the only visual dimensionality. UI chrome remains calm and flat by intent.
 
-- Rectangular surfaces use `border-radius: 0`.
-- No box shadows, gradients, glass effects, glow, rounded cards, or floating panels.
-- Separation uses white space, a `1px` quiet rule, a `1px` ink structural rule, or a `2px` ink interactive border.
-- Black fill is reserved for ribbons and the footer. Keyboard images, not UI chrome, provide dimensional depth.
-
-## 8. Accessibility Constraints & Accepted Debt
+## 8. Accessibility Constraints, Handoff, and Accepted Debt
 
 ### Constraints
 
-- WCAG 2.2 AA target: full keyboard navigation, logical visual/tab order, semantic landmarks, visible focus, and 44px preferred touch controls.
-- Focus must not be hidden by fixed navigation or dialogs; use scroll padding where a persistent header exists.
-- Images reserve their size to prevent layout shift, while below-the-fold images load lazily.
-- Every route has a unique title, language metadata, description, and canonical URL once deployment host is configured.
-- Meaningful image alternatives describe the product/material/composition rather than repeat nearby text. Decorative SVG art is explicitly marked decorative.
+- WCAG 2.2 AA target with logical source/tab order, semantic landmarks, full keyboard operation, visible 2px focus, and 44px controls.
+- Focus must not be obscured by headers or dialogs. Dialog focus stays inside while open and returns to the invoker on close.
+- Color is never the sole state indicator. Hover has a keyboard-equivalent focus state; disabled controls remain perceivable.
+- Images reserve space, local optimized assets remain the source, and below-the-fold images may lazy-load without hiding content.
+- CJK line breaks must avoid orphaned particles, detached short clauses, clipped glyphs, and forced letter spacing.
+- Validate all routes and primitive states at 375px, 768px, and 1280px with no horizontal primary-content overflow.
 
-### Accepted Debt
+### Implementation boundaries
 
-- None for the local catalog migration. The supplied inventory is copied into `src/assets/keyboards/`, and runtime pages contain no remote image or source-attribution URLs.
+- This foundation preserves Astro markup, selectors, data, routes, assets, native details/dialog/lightbox behavior, and static/no-JavaScript fallbacks.
+- Future route-specific redesign work must extend this document before adding new tokens, variants, states, or motion.
+- MCHOSE branding and proprietary materials remain out of scope; the adaptation must continue using project-owned content and original tokens.
+
+### Accepted debt
+
+- Route-specific layout files still carry the previous editorial compositions until subsequent scoped work migrates them. The aliases in `tokens.css` keep those surfaces coherent during transition.
+- Some source images retain baked-in whitespace; the bounded `.model-entry` and `.model-dialog-figure` presentation exception compensates only on those listing surfaces until the assets are normalized.
+- No accessibility debt is accepted for the shared primitives in this foundation.
