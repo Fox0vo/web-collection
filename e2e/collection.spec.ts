@@ -5,9 +5,12 @@ const sitePath = (path: string): string => `/web-collection${path}`;
 test("renders every static route with its editorial heading", async ({ page }) => {
   const routes = [
     { path: "/", heading: "键盘，按品牌归档。" },
-    { path: "/gallery/", heading: "四个品牌，七组型号。" },
+    { path: "/gallery/", heading: "挑选品牌，浏览每一款配色。" },
     { path: "/gallery/skn-qinglong-4/", heading: "SKN 青龙4.0" },
+    { path: "/gallery/skn-qinglong-jingtan/", heading: "SKN 青龙惊碳" },
     { path: "/gallery/mchose-g98-pro-v2/", heading: "迈从 MCHOSE G98 Pro V2" },
+    { path: "/gallery/mchose-g98-v3/", heading: "迈从 MCHOSE G98 V3" },
+    { path: "/gallery/mchose-k99-v3/", heading: "迈从 MCHOSE K99 V3" },
     { path: "/gallery/epomaker-galaxy100/", heading: "EPOMAKER Galaxy100" },
     { path: "/gallery/vgn-v108/", heading: "VGN V108" },
     { path: "/showcase/", heading: "印刷规则构成的界面原件。" },
@@ -22,6 +25,9 @@ test("renders every static route with its editorial heading", async ({ page }) =
 test("starts with four collapsed brand accordions containing seven model links", async ({ page }) => {
   await page.goto(sitePath("/gallery/"));
 
+  await expect(page.locator(".page-intro .lead")).toHaveText(
+    "展开品牌并选择型号，浏览完整配色与轴体版本；点击卡片即可查看每张产品正面图。",
+  );
   const brandSections = page.locator("details[data-brand-section]");
   await expect(brandSections).toHaveCount(4);
   await expect(page.locator("[data-model-link]")).toHaveCount(7);
@@ -46,6 +52,9 @@ test("expands only the selected brand model entries", async ({ page }) => {
 
   await expect(mchose).toHaveAttribute("open", "");
   await expect(mchose.locator("[data-model-link]:visible")).toHaveCount(3);
+  await expect(
+    mchose.getByRole("link", { name: /G98 Pro V2/ }).locator(".model-entry-summary"),
+  ).toContainText(/共 7 组配色，\d+ 张产品正面图。/);
   await expect(page.locator("details[data-brand-section]:not([open]) [data-model-link]:visible")).toHaveCount(0);
 });
 
@@ -62,6 +71,10 @@ test("opens model colors in place and returns focus after Escape", async ({ page
   await expect(page).toHaveURL(catalogUrl);
   await expect(dialog).toBeVisible();
   await expect(activePanel.locator("[data-model-dialog-color]")).toHaveCount(7);
+  const imageCount = await activePanel.locator(".model-dialog-figure").count();
+  await expect(activePanel.locator(".model-dialog-header > p:last-child")).toHaveText(
+    `共 7 组配色，${imageCount} 张产品正面图。`,
+  );
   for (const colorName of ["冰川渐变", "橙蓝", "灰蓝", "蓝色", "极夜黑", "黑莓粉", "黑紫"]) {
     await expect(activePanel.getByRole("heading", { name: colorName, exact: true })).toBeVisible();
   }
@@ -83,6 +96,7 @@ test("keeps every model dialog linked to its canonical fallback page", async ({ 
   );
   const activePanel = dialog.locator("[data-model-dialog-panel]:not([hidden])");
   const orangeBlue = activePanel.locator("[data-model-dialog-color]", { hasText: "橙蓝" });
+  await expect(orangeBlue.getByText("共 2 张产品正面图", { exact: true })).toBeVisible();
   await expect(orangeBlue.getByText("雪虎轴", { exact: true })).toBeVisible();
   await expect(orangeBlue.getByText("烈焰橙轴", { exact: true })).toBeVisible();
 });

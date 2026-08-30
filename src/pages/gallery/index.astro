@@ -2,7 +2,7 @@
 import EditorialRibbon from "../../components/EditorialRibbon.astro";
 import Figure from "../../components/Figure.astro";
 import ModelDialog from "../../components/ModelDialog.astro";
-import { allModels, brands } from "../../data/keyboards";
+import { allModels, brands, colorVariantCount } from "../../data/keyboards";
 import { resolveImage } from "../../lib/images";
 import { sitePath } from "../../lib/urls";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -14,12 +14,12 @@ const modelIndices: ReadonlyMap<string, number> = new Map(
 
 <BaseLayout
   title="键盘目录｜Web Collection"
-  description="按 SKN、迈从 MCHOSE、EPOMAKER 与 VGN 浏览 7 组键盘型号和 27 组真实配色。"
+  description={`按 SKN、迈从 MCHOSE、EPOMAKER 与 VGN 浏览 ${allModels.length} 组键盘型号和 ${colorVariantCount} 组真实配色。`}
 >
   <header class="frame page-intro">
-    <EditorialRibbon label="KEYBOARD CATALOG / LOCAL ARCHIVE" />
-    <h1 class="page-title"><span>四个品牌，</span><br /><span>七组型号。</span></h1>
-    <p class="lead">展开品牌查看主型号；选择型号后，可在同一页浏览全部配色、<span class="gallery-semantic-phrase">轴体与官方版本</span>。目录使用 41 张<span class="gallery-semantic-phrase">本地正面图</span>。</p>
+    <EditorialRibbon label="KEYBOARD SHOWCASE / 键盘图库" />
+    <h1 class="page-title"><span>挑选品牌，</span><br /><span>浏览每一款配色。</span></h1>
+    <p class="lead">展开品牌并选择型号，浏览完整配色与<span class="nowrap">轴体版本</span>；点击卡片即可查看<span class="nowrap">每张产品正面图</span>。</p>
   </header>
 
   <brand-catalog>
@@ -48,8 +48,9 @@ const modelIndices: ReadonlyMap<string, number> = new Map(
             </summary>
 
             <ol class="model-list">
-              {brand.models.map((model, modelIndex) => {
+              {brand.models.map((model) => {
                 const representative = model.colors[0].images[0];
+                const imageCount = model.colors.reduce((total, color) => total + color.images.length, 0);
                 const modelIndexValue = modelIndices.get(model.slug);
                 if (modelIndexValue === undefined) return null;
 
@@ -68,15 +69,10 @@ const modelIndices: ReadonlyMap<string, number> = new Map(
                         variant="catalog-4x3"
                       />
                       <span class="model-entry-copy">
-                        <span class="model-entry-number" aria-hidden="true">
-                          {String(modelIndex + 1).padStart(2, "0")}
-                        </span>
-                        <span class="kicker">{brand.name} / {model.colors.length} 组配色</span>
                         <span class="model-entry-title" role="heading" aria-level="3">{model.name}</span>
+                        <span class="kicker">{brand.name}</span>
                         <span class="model-entry-summary">
-                          {model.slug === "mchose-k99-v3" ? (
-                            <>{model.summary.slice(0, -"冰橘轴正面图。".length)}<span class="gallery-semantic-phrase">冰橘轴正面图</span>{model.summary.slice(-1)}</>
-                          ) : model.summary}
+                          共 {model.colors.length} 组配色，{imageCount} 张产品正面图。
                         </span>
                       </span>
                     </a>

@@ -17,56 +17,60 @@ const models = brands.flatMap((brand) =>
 
 <dialog class="model-dialog" aria-label="型号配色一览">
   {
-    models.map(({ brandName, model }, modelIndex) => (
-      <section
-        class="model-dialog-panel"
-        aria-labelledby={`model-dialog-${model.slug}-title`}
-        data-model-dialog-panel
-        hidden={modelIndex !== 0}
-      >
-        <header class="model-dialog-header">
-          <EditorialRibbon label={`${brandName} / MODEL`} />
-          <h2 id={`model-dialog-${model.slug}-title`}>{model.name}</h2>
-          <p>{model.summary}</p>
-        </header>
+    models.map(({ brandName, model }, modelIndex) => {
+      const imageCount = model.colors.reduce((total, color) => total + color.images.length, 0);
 
-        <div class="model-dialog-toolbar">
-          <button class="model-dialog-control" type="button" data-model-dialog-close>关闭</button>
-          <a class="model-dialog-fullpage-link" href={sitePath(`/gallery/${model.slug}/`)}>
-            查看完整型号页与放大图片
-          </a>
-        </div>
+      return (
+        <section
+          class="model-dialog-panel"
+          aria-labelledby={`model-dialog-${model.slug}-title`}
+          data-model-dialog-panel
+          hidden={modelIndex !== 0}
+        >
+          <header class="model-dialog-header">
+            <EditorialRibbon label={`${brandName} / MODEL`} />
+            <h2 id={`model-dialog-${model.slug}-title`}>{model.name}</h2>
+            <p>共 {model.colors.length} 组配色，{imageCount} 张产品正面图。</p>
+          </header>
 
-        <div class="model-dialog-colors">
-          {model.colors.map((color, colorIndex) => (
-            <section
-              class="model-dialog-color"
-              aria-labelledby={`model-dialog-${model.slug}-${color.slug}-title`}
-              data-model-dialog-color
-            >
-              <header class="model-dialog-color-heading">
-                <p class="kicker">COLOR {String(colorIndex + 1).padStart(2, "0")}</p>
-                <h3 id={`model-dialog-${model.slug}-${color.slug}-title`}>{color.name}</h3>
-                <p>{color.images.length} 个轴体／官方版本</p>
-              </header>
-              <div class="model-dialog-figures">
-                {color.images.map((image) => (
-                  <div class="model-dialog-figure">
-                    <p class="kicker model-dialog-variant">{image.variant ?? color.name}</p>
-                    <Figure
-                      src={resolveImage(image.asset)}
-                      alt={image.alt}
-                      caption={image.caption}
-                      variant="catalog-4x3"
-                    />
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </section>
-    ))
+          <div class="model-dialog-toolbar">
+            <button class="model-dialog-control" type="button" data-model-dialog-close>关闭</button>
+            <a class="model-dialog-fullpage-link" href={sitePath(`/gallery/${model.slug}/`)}>
+              查看完整型号页与放大图片
+            </a>
+          </div>
+
+          <div class="model-dialog-colors">
+            {model.colors.map((color, colorIndex) => (
+              <section
+                class="model-dialog-color"
+                aria-labelledby={`model-dialog-${model.slug}-${color.slug}-title`}
+                data-model-dialog-color
+              >
+                <header class="model-dialog-color-heading">
+                  <p class="kicker">COLOR {String(colorIndex + 1).padStart(2, "0")}</p>
+                  <h3 id={`model-dialog-${model.slug}-${color.slug}-title`}>{color.name}</h3>
+                  <p>共 {color.images.length} 张产品正面图</p>
+                </header>
+                <div class="model-dialog-figures">
+                  {color.images.map((image) => (
+                    <div class="model-dialog-figure">
+                      <p class="kicker model-dialog-variant">{image.variant ?? color.name}</p>
+                      <Figure
+                        src={resolveImage(image.asset)}
+                        alt={image.alt}
+                        caption={image.caption}
+                        variant="catalog-4x3"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </section>
+      );
+    })
   }
 </dialog>
 
