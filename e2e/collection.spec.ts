@@ -8,11 +8,11 @@ test("renders every static route with its editorial heading", async ({ page }) =
     { path: "/gallery/", heading: "挑选品牌，浏览每一款配色。" },
     { path: "/gallery/skn-qinglong-4/", heading: "SKN 青龙4.0" },
     { path: "/gallery/skn-qinglong-jingtan/", heading: "SKN 青龙惊碳" },
-    { path: "/gallery/mchose-g98-pro-v2/", heading: "迈从 MCHOSE G98 Pro V2" },
     { path: "/gallery/mchose-g98-v3/", heading: "迈从 MCHOSE G98 V3" },
     { path: "/gallery/mchose-k99-v3/", heading: "迈从 MCHOSE K99 V3" },
     { path: "/gallery/epomaker-galaxy100/", heading: "EPOMAKER Galaxy100" },
     { path: "/gallery/vgn-v108/", heading: "VGN V108" },
+    { path: "/gallery/vgn-v98-pro-v4/", heading: "VGN V98 Pro V4" },
     { path: "/showcase/", heading: "印刷规则构成的界面原件。" },
   ] as const;
 
@@ -26,7 +26,7 @@ test("starts with four collapsed brand accordions containing seven model links",
   await page.goto(sitePath("/gallery/"));
 
   await expect(page.locator(".page-intro .lead")).toHaveText(
-    "展开品牌并选择型号，浏览完整配色与轴体版本；点击卡片即可查看每张产品正面图。",
+    "展开品牌并选择型号，浏览完整配色；点击卡片即可查看每张产品正面图。",
   );
   const brandSections = page.locator("details[data-brand-section]");
   await expect(brandSections).toHaveCount(4);
@@ -51,18 +51,18 @@ test("expands only the selected brand model entries", async ({ page }) => {
   await mchose.locator("summary").click();
 
   await expect(mchose).toHaveAttribute("open", "");
-  await expect(mchose.locator("[data-model-link]:visible")).toHaveCount(3);
+  await expect(mchose.locator("[data-model-link]:visible")).toHaveCount(2);
   await expect(
-    mchose.getByRole("link", { name: /G98 Pro V2/ }).locator(".model-entry-summary"),
-  ).toContainText(/共 7 组配色，\d+ 张产品正面图。/);
+    mchose.getByRole("link", { name: /K99 V3/ }).locator(".model-entry-summary"),
+  ).toContainText("共 8 组配色，8 张产品正面图。");
   await expect(page.locator("details[data-brand-section]:not([open]) [data-model-link]:visible")).toHaveCount(0);
 });
 
 test("opens model colors in place and returns focus after Escape", async ({ page }) => {
   await page.goto(sitePath("/gallery/"));
   const catalogUrl = page.url();
-  await page.locator("#brand-mchose > summary").click();
-  const opener = page.getByRole("link", { name: /G98 Pro V2/ });
+  await page.locator("#brand-vgn > summary").click();
+  const opener = page.getByRole("link", { name: /V98 Pro V4/ });
 
   await opener.click();
 
@@ -70,12 +70,11 @@ test("opens model colors in place and returns focus after Escape", async ({ page
   const activePanel = dialog.locator("[data-model-dialog-panel]:not([hidden])");
   await expect(page).toHaveURL(catalogUrl);
   await expect(dialog).toBeVisible();
-  await expect(activePanel.locator("[data-model-dialog-color]")).toHaveCount(7);
-  const imageCount = await activePanel.locator(".model-dialog-figure").count();
+  await expect(activePanel.locator("[data-model-dialog-color]")).toHaveCount(6);
   await expect(activePanel.locator(".model-dialog-header > p:last-child")).toHaveText(
-    `共 7 组配色，${imageCount} 张产品正面图。`,
+    "共 6 组配色，6 张产品正面图。",
   );
-  for (const colorName of ["冰川渐变", "橙蓝", "灰蓝", "蓝色", "极夜黑", "黑莓粉", "黑紫"]) {
+  for (const colorName of ["云间白", "海盐", "珊瑚橙", "折影白", "暗夜", "极地限定"]) {
     await expect(activePanel.getByRole("heading", { name: colorName, exact: true })).toBeVisible();
   }
 
@@ -86,19 +85,20 @@ test("opens model colors in place and returns focus after Escape", async ({ page
 
 test("keeps every model dialog linked to its canonical fallback page", async ({ page }) => {
   await page.goto(sitePath("/gallery/"));
-  await page.locator("#brand-mchose > summary").click();
-  await page.getByRole("link", { name: /G98 Pro V2/ }).click();
+  await page.locator("#brand-vgn > summary").click();
+  await page.getByRole("link", { name: /V98 Pro V4/ }).click();
 
   const dialog = page.getByRole("dialog", { name: "型号配色一览" });
   await expect(dialog.getByRole("link", { name: /完整型号页/ })).toHaveAttribute(
     "href",
-    sitePath("/gallery/mchose-g98-pro-v2/"),
+    sitePath("/gallery/vgn-v98-pro-v4/"),
   );
   const activePanel = dialog.locator("[data-model-dialog-panel]:not([hidden])");
-  const orangeBlue = activePanel.locator("[data-model-dialog-color]", { hasText: "橙蓝" });
-  await expect(orangeBlue.getByText("共 2 张产品正面图", { exact: true })).toBeVisible();
-  await expect(orangeBlue.getByText("雪虎轴", { exact: true })).toBeVisible();
-  await expect(orangeBlue.getByText("烈焰橙轴", { exact: true })).toBeVisible();
+  const cloudWhite = activePanel.locator("[data-model-dialog-color]", { hasText: "云间白" });
+  await expect(cloudWhite.getByText("共 1 张产品正面图", { exact: true })).toBeVisible();
+  await expect(
+    cloudWhite.locator(".model-dialog-figure").getByText("云间白", { exact: true }),
+  ).toBeVisible();
 });
 
 test("opens a matching brand accordion from its hash", async ({ page }) => {
@@ -116,19 +116,22 @@ test("opens a matching brand accordion from its hash", async ({ page }) => {
   await expect(page.locator("details[data-brand-section][open]")).toHaveCount(1);
 });
 
-test("labels every local variant in a multi-image color", async ({ page }) => {
-  await page.goto(sitePath("/gallery/mchose-g98-pro-v2/#color-chenglan"));
+test("shows two real K99 color samples in the component showcase", async ({ page }) => {
+  await page.goto(sitePath("/showcase/"));
 
-  const color = page.locator("#color-chenglan");
-  await expect(color.getByText("雪虎轴", { exact: true })).toBeVisible();
-  await expect(color.getByText("烈焰橙轴", { exact: true })).toBeVisible();
-  await expect(color.locator(".lightbox-trigger img")).toHaveCount(2);
+  await expect(page.locator(".lightbox-trigger img")).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: "星核白 · 正面图 · 放大查看", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "金沙白 · 正面图 · 放大查看", exact: true }),
+  ).toBeVisible();
 });
 
 test("loads every inline keyboard image after scrolling it into view", async ({ page }) => {
   const routes = [
     { path: "/gallery/", selector: "details[data-brand-section] .figure img" },
-    { path: "/gallery/mchose-g98-pro-v2/", selector: ".lightbox-trigger img" },
+    { path: "/gallery/vgn-v98-pro-v4/", selector: ".lightbox-trigger img" },
   ] as const;
 
   for (const route of routes) {
@@ -189,18 +192,18 @@ test("opens and closes mobile navigation with the keyboard", async ({ page }) =>
   await expect(menuButton).toBeFocused();
 });
 
-test("operates the model image browser by keyboard", async ({ page }) => {
-  await page.goto(sitePath("/gallery/mchose-g98-pro-v2/#color-chenglan"));
+test("operates the showcase image browser by keyboard", async ({ page }) => {
+  await page.goto(sitePath("/showcase/"));
 
-  const trigger = page.getByRole("button", { name: /橙蓝 · 雪虎轴 · 放大查看/ });
+  const trigger = page.getByRole("button", { name: "星核白 · 正面图 · 放大查看", exact: true });
   await trigger.focus();
   await page.keyboard.press("Enter");
-  const dialog = page.getByRole("dialog", { name: "G98 Pro V2 图像浏览器" });
+  const dialog = page.getByRole("dialog", { name: "组件样张图像浏览器" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator(".lightbox-panel:not([hidden]) img")).toHaveAttribute("alt", /雪虎轴/);
+  await expect(dialog.locator(".lightbox-panel:not([hidden]) img")).toHaveAttribute("alt", /星核白/);
 
   await page.keyboard.press("ArrowRight");
-  await expect(dialog.locator(".lightbox-panel:not([hidden]) img")).toHaveAttribute("alt", /烈焰橙轴/);
+  await expect(dialog.locator(".lightbox-panel:not([hidden]) img")).toHaveAttribute("alt", /金沙白/);
 
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();

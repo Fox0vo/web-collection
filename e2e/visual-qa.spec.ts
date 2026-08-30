@@ -5,11 +5,11 @@ const routes = [
   { slug: "gallery", path: "/gallery/" },
   { slug: "skn-qinglong-4", path: "/gallery/skn-qinglong-4/" },
   { slug: "skn-qinglong-jingtan", path: "/gallery/skn-qinglong-jingtan/" },
-  { slug: "mchose-g98-pro-v2", path: "/gallery/mchose-g98-pro-v2/" },
   { slug: "mchose-g98-v3", path: "/gallery/mchose-g98-v3/" },
   { slug: "mchose-k99-v3", path: "/gallery/mchose-k99-v3/" },
   { slug: "epomaker-galaxy100", path: "/gallery/epomaker-galaxy100/" },
   { slug: "vgn-v108", path: "/gallery/vgn-v108/" },
+  { slug: "vgn-v98-pro-v4", path: "/gallery/vgn-v98-pro-v4/" },
   { slug: "showcase", path: "/showcase/" },
 ] as const;
 
@@ -64,7 +64,7 @@ test("captures expanded brand accordions at every required viewport", async ({ p
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.goto(sitePath("/gallery/"));
-    await page.locator("#brand-mchose > summary").click();
+    await page.locator("#brand-vgn > summary").click();
     await preloadVisibleInlineImages(page);
     await page.screenshot({
       path: `.omo/evidence/keyboard-catalog/gallery-${viewport.width}-accordion-expanded.png`,
@@ -74,7 +74,7 @@ test("captures expanded brand accordions at every required viewport", async ({ p
   }
 });
 
-test("captures mobile menu, model dialog, and model-page lightbox states", async ({ page }) => {
+test("captures mobile menu, V98 dialog top and bottom, and showcase lightbox states", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(sitePath("/"));
   await page.getByRole("button", { name: "目录" }).click();
@@ -83,8 +83,8 @@ test("captures mobile menu, model dialog, and model-page lightbox states", async
 
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(sitePath("/gallery/"));
-  await page.locator("#brand-mchose > summary").click();
-  await page.getByRole("link", { name: /G98 Pro V2/ }).click();
+  await page.locator("#brand-vgn > summary").click();
+  await page.getByRole("link", { name: /V98 Pro V4/ }).click();
   await preloadVisibleInlineImages(page);
   const modelDialog = page.getByRole("dialog", { name: "型号配色一览" });
   await modelDialog.evaluate((element) => {
@@ -93,8 +93,22 @@ test("captures mobile menu, model dialog, and model-page lightbox states", async
   await expect(modelDialog.getByRole("button", { name: "关闭" })).toBeVisible();
   await page.screenshot({ path: ".omo/evidence/keyboard-catalog/gallery-1280-model-dialog.png" });
 
-  await page.goto(sitePath("/gallery/mchose-g98-pro-v2/#color-chenglan"));
-  await page.getByRole("button", { name: /橙蓝 · 雪虎轴 · 放大查看/ }).click();
+  await modelDialog.evaluate((element) => {
+    if (element instanceof HTMLDialogElement) element.scrollTop = element.scrollHeight;
+  });
+  await expect
+    .poll(() =>
+      modelDialog.evaluate((element) =>
+        element instanceof HTMLDialogElement ? element.scrollTop : 0,
+      ),
+    )
+    .toBeGreaterThan(0);
+  await page.screenshot({ path: ".omo/evidence/keyboard-catalog/gallery-1280-model-dialog-bottom.png" });
+
+  await page.goto(sitePath("/showcase/"));
+  await page
+    .getByRole("button", { name: "星核白 · 正面图 · 放大查看", exact: true })
+    .click();
   await preloadVisibleInlineImages(page);
-  await page.screenshot({ path: ".omo/evidence/keyboard-catalog/mchose-g98-pro-v2-1280-lightbox.png" });
+  await page.screenshot({ path: ".omo/evidence/keyboard-catalog/showcase-1280-lightbox.png" });
 });

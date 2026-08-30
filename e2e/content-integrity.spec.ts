@@ -4,6 +4,11 @@ import { allModels, brands } from "../src/data/keyboards";
 const sitePath = (path: string): string => `/web-collection${path}`;
 
 const colorCount = allModels.reduce((total, model) => total + model.colors.length, 0);
+const imageEntryCount: number = allModels.reduce(
+  (modelTotal, model) =>
+    modelTotal + model.colors.reduce((colorTotal, color) => colorTotal + color.images.length, 0),
+  0,
+);
 const modelImageCounts = allModels.reduce((counts, model) => {
   counts.set(
     model.slug,
@@ -20,7 +25,27 @@ const imageCountFor = (modelSlug: string): number => {
 
 const featuredModel = brands[1].models[0];
 const showcaseModel = brands[1].models[1];
-const k99Model = brands[1].models[2];
+const k99Model = brands[1].models[1];
+
+test("matches the authoritative seven-model catalog inventory", () => {
+  expect(brands).toHaveLength(4);
+  expect(allModels).toHaveLength(7);
+  expect(colorCount).toBe(35);
+  expect(imageEntryCount).toBe(35);
+  expect(allModels.map((model) => model.slug)).toEqual([
+    "skn-qinglong-4",
+    "skn-qinglong-jingtan",
+    "mchose-g98-v3",
+    "mchose-k99-v3",
+    "epomaker-galaxy100",
+    "vgn-v108",
+    "vgn-v98-pro-v4",
+  ]);
+
+  for (const model of allModels) {
+    for (const color of model.colors) expect(color.images).toHaveLength(1);
+  }
+});
 
 test("reports catalog totals derived from the keyboard data", async ({ page }) => {
   await page.goto(sitePath("/"));
@@ -39,8 +64,11 @@ test("keeps intentional semantic phrases intact within a 375px viewport", async 
   await page.setViewportSize({ width: 375, height: 800 });
   const routes = [
     { path: "/", phrases: ["键盘收藏", "它们的外观与配色", "每一把", "正面图"] },
-    { path: "/gallery/", phrases: ["轴体版本", "每张产品正面图"] },
-    { path: "/showcase/", phrases: ["长中文换行", "按钮状态与原生对话框交互", "自然换行"] },
+    { path: "/gallery/", phrases: ["完整配色", "每张产品正面图"] },
+    {
+      path: "/showcase/",
+      phrases: ["长中文换行", "按钮状态与原生对话框交互", "自然换行", "这样的连续标识", "窄屏内"],
+    },
   ];
 
   for (const route of routes) {
