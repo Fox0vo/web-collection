@@ -6,17 +6,19 @@
 
 html {
   scroll-padding-block-start: var(--space-24);
-  background: var(--color-paper);
+  overflow-x: clip;
+  background: var(--color-canvas);
 }
 
 body {
   min-block-size: 100dvh;
   margin: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-reading);
+  overflow-x: clip;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-sans);
   font-size: var(--type-body);
-  line-height: 1.65;
+  line-height: var(--line-height-body);
   text-rendering: optimizeLegibility;
 }
 
@@ -28,6 +30,10 @@ img,
 svg {
   display: block;
   max-inline-size: 100%;
+}
+
+img {
+  block-size: auto;
 }
 
 a {
@@ -46,12 +52,12 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-link);
+  outline: var(--focus-width) solid var(--color-accent);
   outline-offset: var(--space-1);
 }
 
 ::selection {
-  background: var(--color-ink);
+  background: var(--color-accent);
   color: var(--color-inverse);
 }
 
@@ -75,11 +81,17 @@ ol {
   inset-block-start: var(--space-2);
   inset-inline-start: var(--space-2);
   z-index: 10;
-  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  min-block-size: var(--control-min-size);
+  padding-inline: var(--space-4);
   transform: translateY(calc(-100% - var(--space-4)));
-  background: var(--color-ink);
+  border-radius: var(--radius-sm);
+  background: var(--color-inverse-surface);
   color: var(--color-inverse);
   font-family: var(--font-ui);
+  font-size: var(--type-ui);
+  font-weight: var(--font-weight-semibold);
 }
 
 .skip-link:focus {
@@ -88,19 +100,21 @@ ol {
 
 .kicker {
   margin-block-end: var(--space-2);
+  color: var(--color-text-muted);
   font-family: var(--font-meta);
   font-size: var(--type-meta);
-  line-height: 1.35;
-  letter-spacing: 0.1em;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-ui);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .lead {
   max-inline-size: 58ch;
-  color: var(--color-ink-soft);
+  color: var(--color-text-muted);
   font-size: var(--type-lead);
   line-break: strict;
-  line-height: 1.55;
+  line-height: var(--line-height-body);
   text-wrap: pretty;
   word-break: auto-phrase;
 }
@@ -110,11 +124,12 @@ ol {
   margin-block-end: var(--space-6);
   font-family: var(--font-display);
   font-size: var(--type-page-title);
-  font-weight: 400;
-  letter-spacing: -0.025em;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
   line-break: strict;
-  line-height: 1.02;
-  text-wrap: pretty;
+  line-height: var(--line-height-tight);
+  text-wrap: balance;
+  word-break: auto-phrase;
 }
 
 .page-title span {
@@ -123,7 +138,11 @@ ol {
 
 .text-link:hover,
 .text-link:focus-visible {
-  color: var(--color-link);
+  color: var(--color-accent-hover);
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {
