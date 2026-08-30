@@ -67,7 +67,7 @@ const colorSections = model.colors.map((color) => ({
               <h2 id={`color-${color.slug}-title`}>{color.name}</h2>
               <p>{color.images.length} 张正面图</p>
             </div>
-            <Lightbox items={color.items} label={`${model.name} 图像浏览器`} />
+            <Lightbox items={color.items} label={`${model.name} 图像浏览器`} priority={index === 0} />
           </section>
         ))
       }

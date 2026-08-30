@@ -13,9 +13,13 @@ export type LightboxItem = {
 type Props = {
   readonly items: readonly LightboxItem[];
   readonly label?: string;
+  readonly priority?: boolean;
 };
 
-const { items, label = "产品图像浏览器" } = Astro.props;
+const { items, label = "产品图像浏览器", priority = false } = Astro.props;
+const responsiveWidths = [320, 480, 640, 800, 1120, 1600, 2240, 3360, 4480];
+const responsiveSizes = "(min-width: 1152px) 1072px, calc(100vw - 32px)";
+const responsiveQuality = 90;
 ---
 
 <light-box>
@@ -32,7 +36,11 @@ const { items, label = "产品图像浏览器" } = Astro.props;
           <Image
             src={item.src}
             alt={item.alt}
-            loading="lazy"
+            widths={responsiveWidths}
+            sizes={responsiveSizes}
+            quality={responsiveQuality}
+            loading={priority ? "eager" : "lazy"}
+            fetchpriority={priority ? "high" : "auto"}
             decoding="async"
           />
           <span class="lightbox-label">{item.label}</span>
@@ -48,7 +56,16 @@ const { items, label = "产品图像浏览器" } = Astro.props;
         items.map((item, index) => (
           <section class="lightbox-panel" data-lightbox-panel hidden={index !== 0}>
             <figure>
-              <Image src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+              <Image
+                src={item.src}
+                alt={item.alt}
+                widths={responsiveWidths}
+                sizes={responsiveSizes}
+                quality={responsiveQuality}
+                loading="lazy"
+                fetchpriority="auto"
+                decoding="async"
+              />
               <figcaption>{item.caption}</figcaption>
             </figure>
           </section>
