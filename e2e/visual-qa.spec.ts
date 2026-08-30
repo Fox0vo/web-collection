@@ -36,6 +36,9 @@ const preloadVisibleInlineImages = async (page: Page): Promise<void> => {
         ),
       )
       .toBe(true);
+    await image.evaluate(async (element) => {
+      if (element instanceof HTMLImageElement) await element.decode();
+    });
   }
 
   await page.evaluate(() => window.scrollTo(0, 0));
