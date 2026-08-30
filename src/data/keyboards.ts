@@ -277,7 +277,7 @@ export const brands = [
         slug: "mchose-k99-v3",
         brand: "mchose",
         name: "K99 V3",
-        summary: "收录 6 组配色，每组包含官方产品图与冰橘轴正面图。",
+        summary: "收录 6 组配色，共 12 张正面图。",
         colors: [
           {
             slug: "xinxingbai",
@@ -510,3 +510,7 @@ export const brands = [
 ] as const satisfies readonly Brand[];
 
 export const allModels: readonly KeyboardModel[] = brands.flatMap<KeyboardModel>((brand) => [...brand.models]);
+
+export const brandCount = brands.length;
+export const modelCount = allModels.length;
+export const colorVariantCount = allModels.reduce((total, model) => total + model.colors.length, 0);
