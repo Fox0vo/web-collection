@@ -1,27 +1,49 @@
 :root {
-  --color-paper: #ffffff;
-  --color-ink: #18181b;
-  --color-ink-soft: #45454d;
-  --color-caption: #73737d;
-  --color-rule: #d9d9df;
-  --color-rule-strong: #18181b;
-  --color-link: #057dbc;
+  --color-canvas: #e9edf3;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f7fa;
+  --color-text: #161a22;
+  --color-text-muted: #4e5a68;
+  --color-border: #d8dee7;
+  --color-border-strong: #99a5b3;
+  --color-accent: #1d61d6;
+  --color-accent-hover: #164da9;
   --color-inverse: #ffffff;
-  --color-footer: #18181b;
+  --color-inverse-surface: #161a22;
 
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
-  --font-reading: "Source Serif 4", Georgia, serif;
-  --font-ui: Arial, "Helvetica Neue", sans-serif;
-  --font-meta: SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  --color-paper: var(--color-canvas);
+  --color-ink: var(--color-text);
+  --color-ink-soft: var(--color-text-muted);
+  --color-caption: var(--color-text-muted);
+  --color-rule: var(--color-border);
+  --color-rule-strong: var(--color-border-strong);
+  --color-link: var(--color-accent);
+  --color-footer: var(--color-inverse-surface);
 
-  --type-display: clamp(3rem, 8vw, 6.5rem);
-  --type-page-title: clamp(2.5rem, 6vw, 5rem);
-  --type-feature-title: clamp(2rem, 4vw, 3.5rem);
-  --type-story-title: clamp(1.45rem, 2.2vw, 2.1rem);
-  --type-lead: 1.25rem;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+  --font-display: var(--font-sans);
+  --font-reading: var(--font-sans);
+  --font-ui: var(--font-sans);
+  --font-meta: var(--font-sans);
+
+  --type-display: clamp(2.5rem, 6vw, 4.75rem);
+  --type-page-title: clamp(2.25rem, 5vw, 4rem);
+  --type-feature-title: clamp(1.75rem, 3.5vw, 2.75rem);
+  --type-story-title: clamp(1.25rem, 2vw, 1.75rem);
+  --type-lead: 1.125rem;
   --type-body: 1rem;
-  --type-ui: 0.875rem;
-  --type-meta: 0.75rem;
+  --type-ui: 0.9375rem;
+  --type-meta: 0.875rem;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.15;
+  --line-height-ui: 1.4;
+  --line-height-body: 1.6;
+  --tracking-tight: -0.02em;
+  --tracking-label: 0.04em;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -33,6 +55,17 @@
   --space-16: 64px;
   --space-24: 96px;
   --page-gutter: var(--space-4);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --border-width: 1px;
+  --border-width-control: 2px;
+  --control-min-size: 44px;
+  --focus-width: 2px;
+
+  --ratio-wide: 16 / 9;
+  --ratio-landscape: 4 / 3;
+  --ratio-portrait: 3 / 4;
 
   --motion-micro: 150ms;
   --motion-standard: 240ms;
