@@ -33,16 +33,19 @@ const responsiveQuality = 90;
           data-lightbox-trigger
           data-index={index}
         >
-          <Image
-            src={item.src}
-            alt={item.alt}
-            widths={responsiveWidths}
-            sizes={responsiveSizes}
-            quality={responsiveQuality}
-            loading={priority ? "eager" : "lazy"}
-            fetchpriority={priority ? "high" : "auto"}
-            decoding="async"
-          />
+          <span class="lightbox-trigger-media">
+            <Image
+              src={item.src}
+              alt={item.alt}
+              widths={responsiveWidths}
+              sizes={responsiveSizes}
+              quality={responsiveQuality}
+              loading={priority && index === 0 ? "eager" : "lazy"}
+              fetchpriority={priority && index === 0 ? "high" : "auto"}
+              decoding="async"
+              style={`--lightbox-source-width: ${item.src.width}px`}
+            />
+          </span>
           <span class="lightbox-label">{item.label}</span>
           <span class="lightbox-action" aria-hidden="true">放大查看</span>
         </button>
@@ -56,16 +59,19 @@ const responsiveQuality = 90;
         items.map((item, index) => (
           <section class="lightbox-panel" data-lightbox-panel hidden={index !== 0}>
             <figure>
-              <Image
-                src={item.src}
-                alt={item.alt}
-                widths={responsiveWidths}
-                sizes={responsiveSizes}
-                quality={responsiveQuality}
-                loading="lazy"
-                fetchpriority="auto"
-                decoding="async"
-              />
+              <div class="lightbox-dialog-media">
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  widths={responsiveWidths}
+                  sizes={responsiveSizes}
+                  quality={responsiveQuality}
+                  loading={priority && index === 0 ? "eager" : "lazy"}
+                  fetchpriority={priority && index === 0 ? "high" : "auto"}
+                  decoding="async"
+                  style={`--lightbox-source-width: ${item.src.width}px`}
+                />
+              </div>
               <figcaption>{item.caption}</figcaption>
             </figure>
           </section>
