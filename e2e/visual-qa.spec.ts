@@ -3,14 +3,13 @@ import { expect, test, type Page } from "@playwright/test";
 const routes = [
   { slug: "home", path: "/" },
   { slug: "gallery", path: "/gallery/" },
-  { slug: "skn-qinglong-4", path: "/gallery/skn-qinglong-4/" },
-  { slug: "skn-qinglong-jingtan", path: "/gallery/skn-qinglong-jingtan/" },
   { slug: "mchose-g98-v3", path: "/gallery/mchose-g98-v3/" },
   { slug: "mchose-k99-v3", path: "/gallery/mchose-k99-v3/" },
-  { slug: "epomaker-galaxy100", path: "/gallery/epomaker-galaxy100/" },
+  { slug: "skn-qinglong-4", path: "/gallery/skn-qinglong-4/" },
+  { slug: "skn-qinglong-jingtan", path: "/gallery/skn-qinglong-jingtan/" },
   { slug: "vgn-v108", path: "/gallery/vgn-v108/" },
   { slug: "vgn-v98-pro-v4", path: "/gallery/vgn-v98-pro-v4/" },
-  { slug: "showcase", path: "/showcase/" },
+  { slug: "epomaker-galaxy100", path: "/gallery/epomaker-galaxy100/" },
 ] as const;
 
 const viewports = [
@@ -66,12 +65,24 @@ const preloadVisibleInlineImages = async (page: Page, restoreTop = true): Promis
   );
 };
 
+const assertColorSectionKickers = async (page: Page): Promise<void> => {
+  const kickers = page.locator("[data-color-section] .kicker");
+  const count = await kickers.count();
+  if (count === 0) return;
+  const expected = Array.from(
+    { length: count },
+    (_, index) => `COLOR ${String(index + 1).padStart(2, "0")}`,
+  );
+  await expect(kickers).toHaveText(expected);
+};
+
 test("captures every page and required viewport", async ({ page }) => {
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     for (const route of routes) {
       await page.goto(sitePath(route.path));
-      await preloadVisibleInlineImages(page, false);
+      await preloadVisibleInlineImages(page);
+      await assertColorSectionKickers(page);
       await page.screenshot({
         path: `.omo/evidence/keyboard-catalog/${route.slug}-${viewport.width}.png`,
         fullPage: true,
@@ -86,7 +97,7 @@ test("captures expanded brand accordions at every required viewport", async ({ p
     await page.setViewportSize(viewport);
     await page.goto(sitePath("/gallery/"));
     await page.locator("#brand-vgn > summary").click();
-    await preloadVisibleInlineImages(page, false);
+    await preloadVisibleInlineImages(page);
     await page.screenshot({
       path: `.omo/evidence/keyboard-catalog/gallery-${viewport.width}-accordion-expanded.png`,
       fullPage: true,
@@ -95,7 +106,28 @@ test("captures expanded brand accordions at every required viewport", async ({ p
   }
 });
 
-test("captures mobile menu, V98 dialog top and bottom, and showcase lightbox states", async ({ page }) => {
+test("captures the gallery nested Lightbox at every required viewport", async ({ page }) => {
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto(sitePath("/gallery/"));
+    await page.locator("#brand-vgn > summary").click();
+    await page.getByRole("link", { name: /V98 Pro V4/ }).click();
+    const modelDialog = page.getByRole("dialog", { name: "型号配色一览", exact: true });
+    await modelDialog
+      .getByRole("button", { name: "云间白 · 正面图 · 放大查看", exact: true })
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: "V98 Pro V4 图像浏览器", exact: true }),
+    ).toBeVisible();
+    await preloadVisibleInlineImages(page);
+    await page.screenshot({
+      path: `.omo/evidence/keyboard-catalog/gallery-${viewport.width}-nested-lightbox.png`,
+      animations: "disabled",
+    });
+  }
+});
+
+test("captures mobile menu and V98 dialog top and bottom states", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(sitePath("/"));
   await page.getByRole("button", { name: "目录" }).click();
@@ -124,12 +156,27 @@ test("captures mobile menu, V98 dialog top and bottom, and showcase lightbox sta
       ),
     )
     .toBeGreaterThan(0);
+  const jidiTrigger = modelDialog.getByRole("button", {
+    name: "极地限定 · 正面图 · 放大查看",
+    exact: true,
+  });
+  const jidiImage = jidiTrigger.locator("img");
+  await jidiImage.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() =>
+      jidiImage.evaluate(
+        (element) =>
+          element instanceof HTMLImageElement && element.complete && element.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
+  await jidiImage.evaluate(async (element) => {
+    if (element instanceof HTMLImageElement) {
+      await element.decode();
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
+    }
+  });
   await page.screenshot({ path: ".omo/evidence/keyboard-catalog/gallery-1280-model-dialog-bottom.png" });
-
-  await page.goto(sitePath("/showcase/"));
-  await page
-    .getByRole("button", { name: "星核白 · 正面图 · 放大查看", exact: true })
-    .click();
-  await preloadVisibleInlineImages(page);
-  await page.screenshot({ path: ".omo/evidence/keyboard-catalog/showcase-1280-lightbox.png" });
 });
