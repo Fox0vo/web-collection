@@ -23,10 +23,9 @@ bun run test:e2e
 
 ## 路由
 
-- `/`：4 个品牌、7 组型号、35 组配色与 35 张本地图的目录导读
-- `/gallery/`：按 SKN、迈从 MCHOSE、EPOMAKER、VGN 分组的型号目录
+- `/`：4 个品牌、7 组型号、42 组配色与 42 张本地图的目录导读
+- `/gallery/`：按 迈从 MCHOSE、SKN、VGN、EPOMAKER 分组的型号目录
 - `/gallery/[model]/`：静态生成的型号页；颜色以 `#color-<slug>` 锚点分节，并展示全部本地正面图版本
-- `/showcase`：组件与状态样张，设置为 `noindex`
 
 ## 本地图片
 

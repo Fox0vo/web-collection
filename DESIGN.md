@@ -23,11 +23,10 @@ Web Collection has two related visual roles, not one template stretched across e
 | Route | Role | Content priority | Visual behavior |
 | --- | --- | --- | --- |
 | `/` | Blog/archive start page | Orient, summarize, and route into the collection | Reading-first hierarchy, archive-like modules, editorial cadence, and more visible text than product routes |
-| `/gallery/` | Primary product showcase and device selector | Compare keyboard families and choose a model | Product-facing introduction, sparse controls, centered imagery, calm white product panels, and clear model actions |
-| `/gallery/[model]/` | Full product detail and canonical fallback | Show every color and local image variant | Complete model information, anchored color sections, contained product images, and a reliable destination when enhancement is unavailable |
-| `/showcase/` | Internal primitive proof | Verify shared primitives and states | `noindex`; demonstrates default, hover, active, focus, disabled, empty, long-copy, and responsive states before route-specific composition |
+| `/gallery/` | Primary product device selector | Compare keyboard families and choose a model | Product-facing introduction, sparse controls, centered imagery, calm white product panels, and clear model actions |
+| `/gallery/[model]/` | Full product detail, canonical SEO route, and no-JavaScript fallback | Show every color and local image variant | Complete model information, anchored color sections, contained product images, and a reliable destination when enhancement is unavailable |
 
-The home page keeps a blog/archive voice. Gallery and model pages adopt the simpler connect-device-inspired product-showcase grammar. Shared primitives bridge the roles through typography, color, spacing, and state consistency rather than forcing identical layouts.
+The home page keeps a blog/archive voice. Gallery and model pages adopt the simpler connect-device-inspired product grammar. Shared primitives bridge the roles through typography, color, spacing, and state consistency rather than forcing identical layouts.
 
 ## 2. Color Tokens
 
@@ -104,7 +103,8 @@ Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-cap
 
 - Semantic `<figure>` with a stable aspect-ratio media well and selectable caption.
 - Media wells are white or muted, 8-12px rounded, and separated by a subtle border or surface contrast only.
-- `catalog-4x3` and `detail-landscape` keyboard imagery uses `object-fit: contain`. Detail-page and Lightbox photography remains fully contained and uncropped. Only `.model-entry` and `.model-dialog-figure` media may use a bounded, static no-clip zoom to trim baked-in source whitespace; the complete keyboard edges, legends, and switch callouts must remain visible.
+- `catalog-4x3` and `detail-landscape` keyboard imagery uses `object-fit: contain`. Detail-page and Lightbox photography remains fully contained and uncropped. Only `.model-entry` media may use a bounded, static no-clip zoom to trim baked-in source whitespace; the complete keyboard edges, legends, and switch callouts must remain visible. ModelDialog color images use contained Lightbox media wells without scale or zoom exceptions.
+- ModelDialog color images are direct Lightbox triggers. Their shared responsive candidates extend through 4480px at quality 90, and the browser selects a DPR-appropriate source for the rendered size. The Lightbox must not crop, apply CSS upscaling, or start a new image request at click time; its candidate must already be available through the shared responsive image contract. A source image whose physical pixels fall below the display pixel demand cannot gain detail and must render at or below its physical dimensions.
 - Meaningful images receive specific alt text; decorative imagery uses empty alt. Explicit image dimensions/aspect ratio reserve layout space.
 
 ### EditorialRibbon
@@ -125,7 +125,7 @@ Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-cap
 - When a brand is expanded, its models render as large white 12px cards. Each card has an image-dominant upper area containing the complete keyboard inside a light muted well, followed by a concise factual metadata area.
 - The lower area uses a near-black model name as the primary label. Supporting metadata is limited to the brand, number of colorways, factual model summary, and a derived local-image count when useful.
 - Never invent battery percentage, connection status, availability, performance claims, color swatches, or other data not present in the catalog. Do not add copied reference icons or decorative device telemetry.
-- The card remains one clear canonical model link and retains its no-JavaScript fallback. Hover, active, and focus states follow StoryTile without interaction-triggered image zoom, lift, or shadow.
+- With enhancement, the model card is the primary trigger for its color-classification ModelDialog. Each color image inside that dialog directly opens a nested high-definition Lightbox without navigating to the canonical model page. The card retains its canonical `/gallery/[model]/` destination as the no-JavaScript fallback. Hover, active, and focus states follow StoryTile without interaction-triggered image zoom, lift, or shadow.
 
 ### TagList
 
@@ -142,13 +142,10 @@ Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-cap
 
 - SiteHeader remains semantically transparent/light and approximately one control-row high; no utility-icon toolbar is added.
 - Brand Accordion remains native `<details>/<summary>` with complete no-JavaScript access to model links. Disclosure changes are instant.
-- ModelDialog and Lightbox remain native `<dialog>` experiences. Escape/backdrop close, focus is managed and returned, controls are labelled, and image/panel changes are instant.
-- Without JavaScript, gallery model links still reach canonical model routes, native details remain operable, and all route content and figures remain readable.
-
-### Primitive Showcase
-
-- `/showcase/` remains internal and `noindex`.
-- It proves every shared primitive at 375px, 768px, and 1280px, including default, hover, active, keyboard focus, disabled, empty, long-copy/CJK, and reduced-motion states.
+- ModelDialog and Lightbox remain native `<dialog>` experiences. The ModelDialog classifies model imagery by color, and every contained color image is a labelled Lightbox trigger. The nested Lightbox presents the selected image at the largest valid DPR-appropriate candidate within its physical dimensions, with no crop or CSS upscaling.
+- Nested dismissal follows the active layer. Escape closes only the topmost Lightbox, then a second Escape closes the ModelDialog. Closing the Lightbox returns focus to its color-image trigger; closing the ModelDialog returns focus to the original model card. Backdrop close follows the same topmost-only rule, controls are labelled, and image/panel changes are instant.
+- The ModelDialog fallback link reads `查看完整型号页` and points to the canonical `/gallery/[model]/` route. It describes the full-detail destination, not an enlargement path.
+- Without JavaScript, gallery model links still reach canonical full-detail and SEO model routes, native details remain operable, and all route content and figures remain readable.
 
 ## 6. Motion and Interaction
 
@@ -160,7 +157,7 @@ Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-cap
 | Easing | `--ease-standard` | `cubic-bezier(0.16, 1, 0.3, 1)` | Existing transform/opacity transitions |
 
 - Motion is restrained and functional. No decorative motion, parallax, animated or interaction-triggered image zoom, lift, animated shadow, or layout animation.
-- Accordion, dialog, lightbox, and model/image changes are intentionally instant.
+- Accordion, dialog, Lightbox, nested dismissal, and model/image changes are intentionally instant and non-decorative.
 - Only `transform`, `opacity`, or bounded `filter` may animate; no width, height, position, margin, padding, or grid animation.
 - Under `prefers-reduced-motion: reduce`, non-essential transition and animation duration becomes zero. Content and no-JavaScript fallbacks remain complete.
 
@@ -177,7 +174,7 @@ Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-cap
 ### Constraints
 
 - WCAG 2.2 AA target with logical source/tab order, semantic landmarks, full keyboard operation, visible 2px focus, and 44px controls.
-- Focus must not be obscured by headers or dialogs. Dialog focus stays inside while open and returns to the invoker on close.
+- Focus must not be obscured by headers or dialogs. Focus stays inside the topmost open dialog. Closing a nested Lightbox returns focus to its color-image trigger; closing the underlying ModelDialog returns focus to the original model card.
 - Color is never the sole state indicator. Hover has a keyboard-equivalent focus state; disabled controls remain perceivable.
 - Images reserve space, local optimized assets remain the source, and below-the-fold images may lazy-load without hiding content.
 - CJK line breaks must avoid orphaned particles, detached short clauses, clipped glyphs, and forced letter spacing.
@@ -185,12 +182,12 @@ Existing names (`--color-paper`, `--color-ink`, `--color-ink-soft`, `--color-cap
 
 ### Implementation boundaries
 
-- This foundation preserves Astro markup, selectors, data, routes, assets, native details/dialog/lightbox behavior, and static/no-JavaScript fallbacks.
+- This foundation preserves the Astro architecture, data, routes, assets, native details/dialog/lightbox behavior, and static/no-JavaScript fallbacks. ModelDialog markup and selectors may change only as needed to replace static figures with the contracted Lightbox triggers and contained media wells.
 - Future route-specific redesign work must extend this document before adding new tokens, variants, states, or motion.
 - MCHOSE branding and proprietary materials remain out of scope; the adaptation must continue using project-owned content and original tokens.
 
 ### Accepted debt
 
 - Route-specific layout files still carry the previous editorial compositions until subsequent scoped work migrates them. The aliases in `tokens.css` keep those surfaces coherent during transition.
-- Some source images retain baked-in whitespace; the bounded `.model-entry` and `.model-dialog-figure` presentation exception compensates only on those listing surfaces until the assets are normalized.
+- Some source images retain baked-in whitespace; the bounded `.model-entry` presentation exception compensates only on that listing surface until the assets are normalized. The former `.model-dialog-figure` scale/zoom exception is retired because ModelDialog figures are replaced by contained Lightbox media wells.
 - No accessibility debt is accepted for the shared primitives in this foundation.
