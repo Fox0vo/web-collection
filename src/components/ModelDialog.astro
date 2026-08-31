@@ -3,7 +3,7 @@ import type { Brand } from "../data/keyboards";
 import { resolveImage } from "../lib/images";
 import { sitePath } from "../lib/urls";
 import EditorialRibbon from "./EditorialRibbon.astro";
-import Figure from "./Figure.astro";
+import Lightbox from "./Lightbox.astro";
 
 type Props = {
   readonly brands: readonly Brand[];
@@ -19,6 +19,16 @@ const models = brands.flatMap((brand) =>
   {
     models.map(({ brandName, model }, modelIndex) => {
       const imageCount = model.colors.reduce((total, color) => total + color.images.length, 0);
+      const colorSections = model.colors.map((color) => ({
+        ...color,
+        items: color.images.map((image) => ({
+          src: resolveImage(image.asset),
+          alt: image.alt,
+          caption: image.caption,
+          label: image.variant ?? color.name,
+          buttonLabel: `${color.name} · ${image.variant ?? "正面图"} · 放大查看`,
+        })),
+      }));
 
       return (
         <section
@@ -36,12 +46,12 @@ const models = brands.flatMap((brand) =>
           <div class="model-dialog-toolbar">
             <button class="model-dialog-control" type="button" data-model-dialog-close>关闭</button>
             <a class="model-dialog-fullpage-link" href={sitePath(`/gallery/${model.slug}/`)}>
-              查看完整型号页与放大图片
+              查看完整型号页
             </a>
           </div>
 
           <div class="model-dialog-colors">
-            {model.colors.map((color, colorIndex) => (
+            {colorSections.map((color, colorIndex) => (
               <section
                 class="model-dialog-color"
                 aria-labelledby={`model-dialog-${model.slug}-${color.slug}-title`}
@@ -52,19 +62,7 @@ const models = brands.flatMap((brand) =>
                   <h3 id={`model-dialog-${model.slug}-${color.slug}-title`}>{color.name}</h3>
                   <p>共 {color.images.length} 张产品正面图</p>
                 </header>
-                <div class="model-dialog-figures">
-                  {color.images.map((image) => (
-                    <div class="model-dialog-figure">
-                      <p class="kicker model-dialog-variant">{image.variant ?? color.name}</p>
-                      <Figure
-                        src={resolveImage(image.asset)}
-                        alt={image.alt}
-                        caption={image.caption}
-                        variant="catalog-4x3"
-                      />
-                    </div>
-                  ))}
-                </div>
+                <Lightbox items={color.items} label={`${model.name} 图像浏览器`} />
               </section>
             ))}
           </div>
@@ -119,7 +117,7 @@ const models = brands.flatMap((brand) =>
       });
 
       dialog.addEventListener("keydown", (event) => {
-        if (event.key !== "Escape") return;
+        if (event.key !== "Escape" || dialog.querySelector(".lightbox-dialog[open]")) return;
         event.preventDefault();
         dialog.close();
       });

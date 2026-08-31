@@ -1,0 +1,183 @@
+.model-dialog {
+  inline-size: min(calc(100% - (2 * var(--space-4))), 1440px);
+  max-block-size: calc(100dvh - (2 * var(--space-4)));
+  padding: 0;
+  overflow: auto;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+.model-dialog::backdrop {
+  background: color-mix(in srgb, var(--color-text) 78%, transparent);
+}
+
+.model-dialog-panel[hidden] {
+  display: none;
+}
+
+.model-dialog-header {
+  padding: var(--space-6) var(--space-6) var(--space-3);
+}
+
+.model-dialog-header .editorial-ribbon {
+  margin-block-end: var(--space-4);
+}
+
+.model-dialog-header h2 {
+  margin-block-end: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--type-feature-title);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-break: strict;
+  line-height: var(--line-height-tight);
+  text-wrap: pretty;
+}
+
+.model-dialog-header > p:last-child {
+  max-inline-size: 58ch;
+  margin-block-end: 0;
+  color: var(--color-text-muted);
+  font-size: var(--type-lead);
+  line-break: strict;
+  line-height: var(--line-height-body);
+  text-wrap: pretty;
+  word-break: auto-phrase;
+}
+
+.model-dialog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-4);
+  padding: 0 var(--space-6) var(--space-4);
+  border-block-end: var(--border-width) solid var(--color-border);
+}
+
+.model-dialog-control {
+  order: 2;
+  min-block-size: var(--control-min-size);
+  padding-inline: var(--space-4);
+  border: var(--border-width-control) solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: var(--type-ui);
+  font-weight: var(--font-weight-semibold);
+}
+
+.model-dialog-control:hover {
+  background: var(--color-accent);
+  color: var(--color-inverse);
+}
+
+.model-dialog-control:active {
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
+  color: var(--color-inverse);
+}
+
+.model-dialog-fullpage-link {
+  order: 1;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--control-min-size);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  font-family: var(--font-ui);
+  font-size: var(--type-ui);
+  font-weight: var(--font-weight-semibold);
+}
+
+.model-dialog-fullpage-link:hover,
+.model-dialog-fullpage-link:focus-visible {
+  color: var(--color-accent-hover);
+}
+
+.model-dialog-colors {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface-muted);
+}
+
+.model-dialog-color {
+  min-inline-size: 0;
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.model-dialog-color-heading {
+  margin-block-end: var(--space-6);
+}
+
+.model-dialog-color-heading h3 {
+  margin-block-end: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--type-feature-title);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--line-height-tight);
+}
+
+.model-dialog-color-heading > p:last-child {
+  margin-block-end: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+}
+
+@media (min-width: 768px) {
+  .model-dialog-header {
+    padding: var(--space-6) var(--space-8) var(--space-3);
+  }
+
+  .model-dialog-toolbar {
+    padding: 0 var(--space-8) var(--space-4);
+  }
+
+  .model-dialog-colors {
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+
+  .model-dialog-color {
+    padding: var(--space-6);
+  }
+
+  .model-dialog-color-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    align-items: end;
+    gap: var(--space-6);
+  }
+
+  .model-dialog-color-heading .kicker,
+  .model-dialog-color-heading h3 {
+    grid-column: 1;
+  }
+
+  .model-dialog-color-heading > p:last-child {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .model-dialog-colors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .model-dialog-color-heading {
+    display: block;
+  }
+}
