@@ -198,7 +198,7 @@ export const brands = [
             name: "云",
             images: [
               {
-                asset: "skn/qinglong-4/yun.webp",
+                asset: "skn/qinglong-4/yun.png",
                 alt: "SKN 青龙4.0 云配色机械键盘正面",
                 caption: "SKN 青龙4.0，云配色正面图。",
               },
@@ -209,7 +209,7 @@ export const brands = [
             name: "电",
             images: [
               {
-                asset: "skn/qinglong-4/dian.webp",
+                asset: "skn/qinglong-4/dian.jpg",
                 alt: "SKN 青龙4.0 电配色机械键盘正面",
                 caption: "SKN 青龙4.0，电配色正面图。",
               },
@@ -220,7 +220,7 @@ export const brands = [
             name: "雷",
             images: [
               {
-                asset: "skn/qinglong-4/lei.webp",
+                asset: "skn/qinglong-4/lei.jpg",
                 alt: "SKN 青龙4.0 雷配色机械键盘正面",
                 caption: "SKN 青龙4.0，雷配色正面图。",
               },

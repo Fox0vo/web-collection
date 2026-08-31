@@ -72,6 +72,17 @@ test("matches the authoritative seven-model catalog inventory", () => {
   }
 });
 
+test("records format-correct runtime asset paths for the SKN 青龙4.0 云/电/雷 colors", () => {
+  const qinglong = modelFor("skn-qinglong-4");
+  const firstThreeAssets = qinglong.colors.slice(0, 3).map((color) => color.images[0].asset);
+
+  expect(firstThreeAssets).toEqual([
+    "skn/qinglong-4/yun.png",
+    "skn/qinglong-4/dian.jpg",
+    "skn/qinglong-4/lei.jpg",
+  ]);
+});
+
 test("reports catalog totals derived from the keyboard data", async ({ page }) => {
   await page.goto(sitePath("/"));
   await expect(page.locator(".hero-note")).toContainText(
