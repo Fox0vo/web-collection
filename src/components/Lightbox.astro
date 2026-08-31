@@ -33,7 +33,7 @@ const responsiveQuality = 90;
           data-lightbox-trigger
           data-index={index}
         >
-          <span class="lightbox-trigger-media">
+          <span class="lightbox-trigger-media" data-lightbox-source>
             <Image
               src={item.src}
               alt={item.alt}
@@ -43,7 +43,7 @@ const responsiveQuality = 90;
               loading={priority && index === 0 ? "eager" : "lazy"}
               fetchpriority={priority && index === 0 ? "high" : "auto"}
               decoding="async"
-              style={`--lightbox-source-width: ${item.src.width}px`}
+              style={`--lightbox-source-width: ${item.src.width}px; --lightbox-source-height: ${item.src.height}px`}
             />
           </span>
           <span class="lightbox-label">{item.label}</span>
@@ -56,22 +56,10 @@ const responsiveQuality = 90;
   <dialog class="lightbox-dialog" aria-label={label}>
     <div aria-live="polite">
       {
-        items.map((item, index) => (
-          <section class="lightbox-panel" data-lightbox-panel hidden={index !== 0}>
+        items.map((item) => (
+          <section class="lightbox-panel" data-lightbox-panel hidden>
             <figure>
-              <div class="lightbox-dialog-media">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  widths={responsiveWidths}
-                  sizes={responsiveSizes}
-                  quality={responsiveQuality}
-                  loading={priority && index === 0 ? "eager" : "lazy"}
-                  fetchpriority={priority && index === 0 ? "high" : "auto"}
-                  decoding="async"
-                  style={`--lightbox-source-width: ${item.src.width}px`}
-                />
-              </div>
+              <div class="lightbox-dialog-media" data-lightbox-destination></div>
               <figcaption>{item.caption}</figcaption>
             </figure>
           </section>
@@ -93,42 +81,96 @@ const responsiveQuality = 90;
       const closeButton = this.querySelector("[data-lightbox-close]");
       const previousButton = this.querySelector("[data-lightbox-previous]");
       const nextButton = this.querySelector("[data-lightbox-next]");
-      const triggers = Array.from(this.querySelectorAll<HTMLButtonElement>("[data-lightbox-trigger]"));
-      const panels = Array.from(this.querySelectorAll<HTMLElement>("[data-lightbox-panel]"));
+      const sourceSlots = Array.from(this.querySelectorAll("[data-lightbox-source]")).filter(
+        (element) => element instanceof HTMLElement,
+      );
+      const images = Array.from(this.querySelectorAll("[data-lightbox-source] > img")).filter(
+        (element) => element instanceof HTMLImageElement,
+      );
+      const destinations = Array.from(this.querySelectorAll("[data-lightbox-destination]")).filter(
+        (element) => element instanceof HTMLElement,
+      );
+      const triggers = Array.from(this.querySelectorAll("[data-lightbox-trigger]")).filter(
+        (element) => element instanceof HTMLButtonElement,
+      );
+      const panels = Array.from(this.querySelectorAll("[data-lightbox-panel]")).filter(
+        (element) => element instanceof HTMLElement,
+      );
+      const itemCount = panels.length;
 
       if (
         !(dialog instanceof HTMLDialogElement) ||
         !(closeButton instanceof HTMLButtonElement) ||
         !(previousButton instanceof HTMLButtonElement) ||
         !(nextButton instanceof HTMLButtonElement) ||
-        panels.length === 0
+        itemCount === 0 ||
+        sourceSlots.length !== itemCount ||
+        images.length !== itemCount ||
+        destinations.length !== itemCount ||
+        triggers.length !== itemCount
       ) return;
 
-      let currentIndex = 0;
+      let currentIndex: number | null = null;
       let opener: HTMLButtonElement | null = null;
 
-      const show = (index: number): void => {
-        currentIndex = (index + panels.length) % panels.length;
-        panels.forEach((panel, panelIndex) => {
-          panel.hidden = panelIndex !== currentIndex;
-        });
+      const parkMountedImage = (): void => {
+        if (currentIndex === null) return;
+        const image = images.at(currentIndex);
+        const sourceSlot = sourceSlots.at(currentIndex);
+        const panel = panels.at(currentIndex);
+        if (!image || !sourceSlot || !panel) return;
+
+        sourceSlot.append(image);
+        panel.hidden = true;
+        currentIndex = null;
+      };
+
+      const show = (index: number): boolean => {
+        const nextIndex = (index + itemCount) % itemCount;
+        const image = images.at(nextIndex);
+        const destination = destinations.at(nextIndex);
+        const panel = panels.at(nextIndex);
+        if (!image || !destination || !panel) return false;
+
+        const sourceWidth = Number.parseFloat(image.style.getPropertyValue("--lightbox-source-width"));
+        const sourceHeight = Number.parseFloat(image.style.getPropertyValue("--lightbox-source-height"));
+        image.style.setProperty("--lightbox-display-max-inline-size", `${sourceWidth / window.devicePixelRatio}px`);
+        image.style.setProperty("--lightbox-display-max-block-size", `${sourceHeight / window.devicePixelRatio}px`);
+
+        parkMountedImage();
+        destination.append(image);
+        panel.hidden = false;
+        currentIndex = nextIndex;
+        return true;
       };
 
       triggers.forEach((trigger) => {
         trigger.addEventListener("click", () => {
-          const index = Number.parseInt(trigger.dataset["index"] ?? "0", 10);
+          const indexValue = trigger.dataset["index"];
+          if (indexValue === undefined) return;
+          const index = Number.parseInt(indexValue, 10);
+          if (!Number.isInteger(index)) return;
+
           opener = trigger;
-          show(index);
+          if (!show(index)) {
+            opener = null;
+            return;
+          }
           dialog.showModal();
           closeButton.focus();
         });
       });
 
-      previousButton.addEventListener("click", () => show(currentIndex - 1));
-      nextButton.addEventListener("click", () => show(currentIndex + 1));
+      previousButton.addEventListener("click", () => {
+        if (currentIndex !== null) show(currentIndex - 1);
+      });
+      nextButton.addEventListener("click", () => {
+        if (currentIndex !== null) show(currentIndex + 1);
+      });
       closeButton.addEventListener("click", () => dialog.close());
 
       dialog.addEventListener("keydown", (event) => {
+        if (currentIndex === null) return;
         if (event.key === "ArrowLeft") show(currentIndex - 1);
         if (event.key === "ArrowRight") show(currentIndex + 1);
       });
@@ -137,7 +179,11 @@ const responsiveQuality = 90;
         if (event.target === dialog) dialog.close();
       });
 
-      dialog.addEventListener("close", () => opener?.focus());
+      dialog.addEventListener("close", () => {
+        parkMountedImage();
+        opener?.focus();
+        opener = null;
+      });
     }
   }
 

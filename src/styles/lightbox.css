@@ -116,8 +116,14 @@
 }
 
 .lightbox-panel img {
-  inline-size: min(100%, var(--lightbox-source-width));
-  max-block-size: 100%;
+  inline-size: min(100%, var(--lightbox-display-max-inline-size));
+  max-block-size: min(
+    var(--lightbox-display-max-block-size),
+    calc(
+      100dvh - var(--space-24) - var(--space-16) - (2 * var(--space-4)) -
+        (2 * var(--border-width))
+    )
+  );
   block-size: auto;
   object-fit: contain;
   object-position: center;
@@ -131,6 +137,7 @@
   line-break: strict;
   line-height: var(--line-height-ui);
   text-wrap: pretty;
+  word-break: keep-all;
 }
 
 .lightbox-toolbar {
