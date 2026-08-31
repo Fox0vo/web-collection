@@ -6,14 +6,13 @@ test("renders every static route with its editorial heading", async ({ page }) =
   const routes = [
     { path: "/", heading: "键盘，按品牌归档。" },
     { path: "/gallery/", heading: "挑选品牌，浏览每一款配色。" },
-    { path: "/gallery/skn-qinglong-4/", heading: "SKN 青龙4.0" },
-    { path: "/gallery/skn-qinglong-jingtan/", heading: "SKN 青龙惊碳" },
     { path: "/gallery/mchose-g98-v3/", heading: "迈从 MCHOSE G98 V3" },
     { path: "/gallery/mchose-k99-v3/", heading: "迈从 MCHOSE K99 V3" },
-    { path: "/gallery/epomaker-galaxy100/", heading: "EPOMAKER Galaxy100" },
+    { path: "/gallery/skn-qinglong-4/", heading: "SKN 青龙4.0" },
+    { path: "/gallery/skn-qinglong-jingtan/", heading: "SKN 青龙惊碳" },
     { path: "/gallery/vgn-v108/", heading: "VGN V108" },
     { path: "/gallery/vgn-v98-pro-v4/", heading: "VGN V98 Pro V4" },
-    { path: "/showcase/", heading: "印刷规则构成的界面原件。" },
+    { path: "/gallery/epomaker-galaxy100/", heading: "EPOMAKER Galaxy100" },
   ] as const;
 
   for (const route of routes) {
@@ -42,6 +41,41 @@ test("starts with four collapsed brand accordions containing seven model links",
       ),
     )
     .toBe(true);
+});
+
+test("renders brand headings in the public catalog order", async ({ page }) => {
+  // Given: the target public brand sequence.
+  const targetBrandHeadings = ["迈从 MCHOSE", "SKN", "VGN", "EPOMAKER"] as const;
+
+  // When: a visitor opens the public gallery catalog.
+  await page.goto(sitePath("/gallery/"));
+
+  // Then: headings expose that exact sequence in the rendered document.
+  await expect(page.locator(".brand-summary-title")).toHaveText(targetBrandHeadings);
+});
+
+test("returns not found for the retired showcase route", async ({ request }) => {
+  // Given: the former public showcase URL.
+  const showcasePath = sitePath("/showcase/");
+
+  // When: the retired route is requested directly.
+  const response = await request.get(showcasePath);
+
+  // Then: it is absent from the published site.
+  expect(response.status()).toBe(404);
+});
+
+test("omits the retired showcase route from public footer navigation", async ({ page }) => {
+  // Given: a public page that renders the shared footer.
+  await page.goto(sitePath("/"));
+
+  // When: footer destinations are inspected for the retired URL.
+  const showcaseLinks = page
+    .getByRole("contentinfo")
+    .locator(`a[href="${sitePath("/showcase/")}"]`);
+
+  // Then: no public footer link exposes that route.
+  await expect(showcaseLinks).toHaveCount(0);
 });
 
 test("expands only the selected brand model entries", async ({ page }) => {
@@ -83,6 +117,46 @@ test("opens model colors in place and returns focus after Escape", async ({ page
   await expect(opener).toBeFocused();
 });
 
+test("opens a gallery color image in a nested Lightbox and restores focus by layer", async ({ page }) => {
+  // Given: the V98 Pro V4 color-classification dialog is open from its gallery model link.
+  await page.goto(sitePath("/gallery/"));
+  await page.locator("#brand-vgn > summary").click();
+  const modelOpener = page.getByRole("link", { name: /V98 Pro V4/ });
+  await modelOpener.click();
+  const modelDialog = page.getByRole("dialog", { name: "型号配色一览", exact: true });
+  const imageTrigger = modelDialog.getByRole("button", {
+    name: "云间白 · 正面图 · 放大查看",
+    exact: true,
+  });
+  await expect(modelDialog).toBeVisible();
+  await expect(imageTrigger).toBeVisible();
+
+  // When: the color image opens its nested high-definition Lightbox.
+  await imageTrigger.click();
+  const lightbox = page.getByRole("dialog", { name: "V98 Pro V4 图像浏览器", exact: true });
+  const activeImage = lightbox.locator(".lightbox-panel:not([hidden]) img");
+  await expect(lightbox).toBeVisible();
+  await expect
+    .poll(() =>
+      activeImage.evaluate(async (element) => {
+        if (!(element instanceof HTMLImageElement)) return false;
+        await element.decode();
+        return element.complete && element.naturalWidth > 0;
+      }),
+    )
+    .toBe(true);
+
+  // Then: Escape dismisses only the active layer and restores each layer's opener.
+  await page.keyboard.press("Escape");
+  await expect(lightbox).toBeHidden();
+  await expect(modelDialog).toBeVisible();
+  await expect(imageTrigger).toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(modelDialog).toBeHidden();
+  await expect(modelOpener).toBeFocused();
+});
+
 test("keeps every model dialog linked to its canonical fallback page", async ({ page }) => {
   await page.goto(sitePath("/gallery/"));
   await page.locator("#brand-vgn > summary").click();
@@ -97,7 +171,7 @@ test("keeps every model dialog linked to its canonical fallback page", async ({ 
   const cloudWhite = activePanel.locator("[data-model-dialog-color]", { hasText: "云间白" });
   await expect(cloudWhite.getByText("共 1 张产品正面图", { exact: true })).toBeVisible();
   await expect(
-    cloudWhite.locator(".model-dialog-figure").getByText("云间白", { exact: true }),
+    cloudWhite.getByRole("button", { name: "云间白 · 正面图 · 放大查看", exact: true }),
   ).toBeVisible();
 });
 
@@ -114,18 +188,6 @@ test("opens a matching brand accordion from its hash", async ({ page }) => {
 
   await expect(page.locator("#brand-vgn")).toHaveAttribute("open", "");
   await expect(page.locator("details[data-brand-section][open]")).toHaveCount(1);
-});
-
-test("shows two real K99 color samples in the component showcase", async ({ page }) => {
-  await page.goto(sitePath("/showcase/"));
-
-  await expect(page.locator(".lightbox-trigger img")).toHaveCount(2);
-  await expect(
-    page.getByRole("button", { name: "星核白 · 正面图 · 放大查看", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "金沙白 · 正面图 · 放大查看", exact: true }),
-  ).toBeVisible();
 });
 
 test("loads every inline keyboard image after scrolling it into view", async ({ page }) => {
@@ -173,12 +235,6 @@ test("keeps desktop navigation available to assistive technology", async ({ page
   await expect(navigation).not.toHaveAttribute("hidden", "");
 });
 
-test("shows the TagList empty state in the component showcase", async ({ page }) => {
-  await page.goto(sitePath("/showcase/"));
-
-  await expect(page.getByText("暂无标签", { exact: true })).toBeVisible();
-});
-
 test("opens and closes mobile navigation with the keyboard", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(sitePath("/"));
@@ -190,22 +246,4 @@ test("opens and closes mobile navigation with the keyboard", async ({ page }) =>
   await page.keyboard.press("Escape");
   await expect(menuButton).toHaveAttribute("aria-expanded", "false");
   await expect(menuButton).toBeFocused();
-});
-
-test("operates the showcase image browser by keyboard", async ({ page }) => {
-  await page.goto(sitePath("/showcase/"));
-
-  const trigger = page.getByRole("button", { name: "星核白 · 正面图 · 放大查看", exact: true });
-  await trigger.focus();
-  await page.keyboard.press("Enter");
-  const dialog = page.getByRole("dialog", { name: "组件样张图像浏览器" });
-  await expect(dialog).toBeVisible();
-  await expect(dialog.locator(".lightbox-panel:not([hidden]) img")).toHaveAttribute("alt", /星核白/);
-
-  await page.keyboard.press("ArrowRight");
-  await expect(dialog.locator(".lightbox-panel:not([hidden]) img")).toHaveAttribute("alt", /金沙白/);
-
-  await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
-  await expect(trigger).toBeFocused();
 });
