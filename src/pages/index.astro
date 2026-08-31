@@ -7,7 +7,9 @@ import { resolveImage } from "../lib/images";
 import { sitePath } from "../lib/urls";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const leadModel = brands[1].models[0];
+const featuredBrand = brands.find((brand) => brand.slug === "mchose");
+if (featuredBrand === undefined) throw new Error("Missing featured brand: mchose");
+const leadModel = featuredBrand.models[0];
 const leadImage = leadModel.colors[0].images[0];
 const leadImageCount = leadModel.colors.reduce((count, color) => count + color.images.length, 0);
 ---
@@ -23,7 +25,7 @@ const leadImageCount = leadModel.colors.reduce((count, color) => count + color.i
       <p class="lead">一处按品牌、型号与配色整理的<span class="nowrap">键盘收藏</span>。从这里走进图库，<span class="nowrap">逐把细看</span><span class="nowrap">它们的外观与配色</span>。</p>
     </div>
     <div>
-      <p class="hero-note">{brandCount} 个品牌，{modelCount} 组型号，{colorVariantCount} 组配色。<span class="nowrap">每一把</span>都配有<span class="nowrap">正面图</span>，方便逐一对照。</p>
+      <p class="hero-note">{brandCount} 个品牌，{modelCount} 组型号，{colorVariantCount} 组配色。<span class="nowrap">每一把都配有正面图</span>，方便逐一对照。</p>
       <OutlineButton href={sitePath("/gallery/")}>浏览键盘图库</OutlineButton>
     </div>
   </section>
@@ -33,7 +35,7 @@ const leadImageCount = leadModel.colors.reduce((count, color) => count + color.i
     <h2 id="feature-title" class="section-heading">从一把键盘开始，细看型号与配色。</h2>
     <StoryTile
       href={sitePath(`/gallery/${leadModel.slug}/`)}
-      kicker={`${brands[1].name} / ${leadModel.colors.length} 组配色`}
+      kicker={`${featuredBrand.name} / ${leadModel.colors.length} 组配色`}
       title={leadModel.name}
       deck={`收录 ${leadModel.colors.length} 组配色、${leadImageCount} 张正面图。`}
       image={{ src: resolveImage(leadImage.asset), alt: leadImage.alt, caption: leadImage.caption }}

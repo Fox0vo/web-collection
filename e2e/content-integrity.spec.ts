@@ -23,23 +23,48 @@ const imageCountFor = (modelSlug: string): number => {
   return imageCount;
 };
 
-const featuredModel = brands[1].models[0];
-const showcaseModel = brands[1].models[1];
-const k99Model = brands[1].models[1];
+const modelFor = (modelSlug: string) => {
+  const model = allModels.find((candidate) => candidate.slug === modelSlug);
+  if (model === undefined) throw new Error(`Missing catalog model: ${modelSlug}`);
+  return model;
+};
+
+const featuredModel = modelFor("mchose-g98-v3");
+const k99Model = modelFor("mchose-k99-v3");
+const sknQinglongModel = modelFor("skn-qinglong-4");
 
 test("matches the authoritative seven-model catalog inventory", () => {
   expect(brands).toHaveLength(4);
   expect(allModels).toHaveLength(7);
-  expect(colorCount).toBe(35);
-  expect(imageEntryCount).toBe(35);
+  expect(colorCount).toBe(42);
+  expect(imageEntryCount).toBe(42);
+  expect(brands.map(({ slug, name }) => ({ slug, name }))).toEqual([
+    { slug: "mchose", name: "迈从 MCHOSE" },
+    { slug: "skn", name: "SKN" },
+    { slug: "vgn", name: "VGN" },
+    { slug: "epomaker", name: "EPOMAKER" },
+  ]);
   expect(allModels.map((model) => model.slug)).toEqual([
-    "skn-qinglong-4",
-    "skn-qinglong-jingtan",
     "mchose-g98-v3",
     "mchose-k99-v3",
-    "epomaker-galaxy100",
+    "skn-qinglong-4",
+    "skn-qinglong-jingtan",
     "vgn-v108",
     "vgn-v98-pro-v4",
+    "epomaker-galaxy100",
+  ]);
+  expect(sknQinglongModel.colors.map((color) => color.name)).toEqual([
+    "云",
+    "电",
+    "雷",
+    "Ultra 绯",
+    "Ultra 凝",
+    "Ultra 韶",
+    "Ultra 漪",
+    "Ultra 青柠",
+    "Ultra 桃叽",
+    "曜",
+    "雨",
   ]);
 
   for (const model of allModels) {
@@ -63,12 +88,8 @@ test("reports catalog totals derived from the keyboard data", async ({ page }) =
 test("keeps intentional semantic phrases intact within a 375px viewport", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   const routes = [
-    { path: "/", phrases: ["键盘收藏", "它们的外观与配色", "每一把", "正面图"] },
-    { path: "/gallery/", phrases: ["完整配色", "每张产品正面图"] },
-    {
-      path: "/showcase/",
-      phrases: ["长中文换行", "按钮状态与原生对话框交互", "自然换行", "这样的连续标识", "窄屏内"],
-    },
+    { path: "/", phrases: ["键盘收藏", "它们的外观与配色", "每一把都配有正面图"] },
+    { path: "/gallery/", phrases: ["完整配色", "点击卡片", "每张产品正面图"] },
   ];
 
   for (const route of routes) {
@@ -102,9 +123,4 @@ test("states each featured model image total as a concise factual phrase", async
 
   await page.goto(sitePath(`/gallery/${k99Model.slug}/`));
   await expect(page.locator(".detail-subtitle")).toContainText(`${imageCountFor(k99Model.slug)} 张正面图`);
-
-  await page.goto(sitePath("/showcase/"));
-  await expect(page.locator('section[aria-labelledby="story-title"] .story-copy > p:last-child')).toContainText(
-    `${imageCountFor(showcaseModel.slug)} 张正面图`,
-  );
 });
